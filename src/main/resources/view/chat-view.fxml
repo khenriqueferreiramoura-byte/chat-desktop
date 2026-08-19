@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane
+        xmlns:fx="http://javafx.com/fxml"
+        fx:controller="com.example.chatdesktop.controller.ChatController">
+
+    <top>
+
+        <VBox spacing="5">
+
+            <padding>
+                <Insets
+                        top="20"
+                        right="20"
+                        bottom="20"
+                        left="20"/>
+            </padding>
+
+            <Label
+                    text="Chat com IA"
+                    styleClass="titulo"/>
+
+            <Label
+                    text="Groq"
+                    styleClass="modelo"/>
+
+        </VBox>
+
+    </top>
+
+    <center>
+
+        <TextArea
+                fx:id="areaChat"
+                editable="false"
+                wrapText="true"
+                promptText="A conversa aparecerá aqui..."/>
+
+    </center>
+
+    <bottom>
+
+        <HBox spacing="10">
+
+            <padding>
+                <Insets
+                        top="15"
+                        right="15"
+                        bottom="15"
+                        left="15"/>
+            </padding>
+
+            <TextField
+                    fx:id="campoMensagem"
+                    promptText="Digite sua mensagem..."
+                    HBox.hgrow="ALWAYS"
+                    onAction="#enviarMensagem"/>
+
+            <Button
+                    fx:id="botaoEnviar"
+                    text="Enviar"
+                    prefWidth="100"
+                    onAction="#enviarMensagem"/>
+
+        </HBox>
+
+    </bottom>
+
+</BorderPane>

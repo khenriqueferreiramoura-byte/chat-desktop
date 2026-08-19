@@ -13,55 +13,41 @@
 
     <name>chat-desktop</name>
 
-    <!-- ===================================================== -->
-    <!-- PROPRIEDADES -->
-    <!-- ===================================================== -->
-
     <properties>
 
-        <!-- Java -->
         <maven.compiler.release>21</maven.compiler.release>
 
-        <!-- Encoding -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <!-- JavaFX -->
         <javafx.version>21.0.6</javafx.version>
 
-        <!-- JUnit -->
         <junit.version>5.12.1</junit.version>
 
     </properties>
 
-
-    <!-- ===================================================== -->
-    <!-- DEPENDÊNCIAS -->
-    <!-- ===================================================== -->
-
     <dependencies>
 
-        <!-- JavaFX Controls -->
+        <!-- JavaFX -->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
             <version>${javafx.version}</version>
         </dependency>
 
-        <!-- JavaFX FXML -->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
             <version>${javafx.version}</version>
         </dependency>
 
-        <!-- JSON -->
+        <!-- Gson -->
         <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-            <version>20240303</version>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.13.1</version>
         </dependency>
 
-        <!-- JUnit API -->
+        <!-- JUnit -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
@@ -69,7 +55,6 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- JUnit Engine -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
@@ -79,16 +64,18 @@
 
     </dependencies>
 
-
-    <!-- ===================================================== -->
-    <!-- BUILD -->
-    <!-- ===================================================== -->
-
     <build>
+
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+            </resource>
+        </resources>
 
         <plugins>
 
-            <!-- Maven Compiler -->
+            <!-- Compilador Java -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -97,11 +84,9 @@
                 <configuration>
                     <release>21</release>
                 </configuration>
-
             </plugin>
 
-
-            <!-- JavaFX Maven Plugin -->
+            <!-- JavaFX -->
             <plugin>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
