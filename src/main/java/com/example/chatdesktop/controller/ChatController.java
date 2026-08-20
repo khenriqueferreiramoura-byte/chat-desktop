@@ -6,16 +6,24 @@ import com.example.chatdesktop.service.GroqService;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
-
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.geometry.Pos;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ChatController {
 
     @FXML
-    private TextArea areaChat;
+    private VBox chatContainer;
+
+    @FXML
+    private ScrollPane chatScroll;
 
     @FXML
     private TextField campoMensagem;
@@ -32,19 +40,9 @@ public class ChatController {
     private final List<ChatMessage> historico;
 
 
-    /*
-     * Identifica qual conversa está ativa.
-     *
-     * Isso evita que uma resposta antiga da Groq
-     * apareça depois que o usuário iniciou uma
-     * nova conversa.
-     */
     private int idConversa = 0;
 
 
-    /*
-     * Prompt principal da IA.
-     */
     private static final String SYSTEM_PROMPT =
             "Você é um assistente útil, educado e objetivo. " +
                     "Responda sempre em português do Brasil.";
@@ -62,6 +60,13 @@ public class ChatController {
     private void initialize() {
 
         iniciarHistorico();
+
+        adicionarMensagemIA(
+                "🍥 Seja bem-vindo ao Naruto AI!\n\n" +
+                        "Estou pronto para conversar com você. " +
+                        "Faça uma pergunta, peça uma explicação " +
+                        "ou comece uma nova conversa."
+        );
 
         campoMensagem.requestFocus();
     }
@@ -110,17 +115,14 @@ public class ChatController {
 
 
         /*
-         * Mostra a mensagem do usuário.
+         * Mostra a mensagem do usuário
          */
 
-        adicionarMensagemNaTela(
-                "Você",
-                mensagem
-        );
+        adicionarMensagemUsuario(mensagem);
 
 
         /*
-         * Adiciona ao histórico da IA.
+         * Adiciona ao histórico
          */
 
         historico.add(
@@ -130,10 +132,6 @@ public class ChatController {
                 )
         );
 
-
-        /*
-         * Guarda qual conversa fez a requisição.
-         */
 
         int conversaAtual = idConversa;
 
@@ -160,82 +158,143 @@ public class ChatController {
 
     /*
      * =====================================================
-     * NOVA CONVERSA
+     * MENSAGEM DO USUÁRIO
      * =====================================================
      */
 
-    @FXML
-    private void novaConversa() {
+    private void adicionarMensagemUsuario(
+            String mensagem
+    ) {
 
         /*
-         * Cria um novo ID.
-         *
-         * Qualquer resposta da conversa anterior
-         * será considerada inválida.
+         * Container da mensagem
          */
 
-        idConversa++;
+        HBox linha = new HBox();
 
+        linha.setAlignment(Pos.CENTER_RIGHT);
 
-        /*
-         * Limpa as mensagens da tela.
-         */
-
-        areaChat.clear();
+        linha.setSpacing(10);
 
 
         /*
-         * Limpa o histórico enviado para a Groq.
+         * ÍCONE DO USUÁRIO
          */
 
-        historico.clear();
+        Label iconeUsuario =
+                new Label("👤");
+
+        iconeUsuario.getStyleClass()
+                .add("user-icon");
 
 
         /*
-         * Adiciona novamente o prompt do sistema.
+         * TEXTO
          */
 
-        historico.add(
-                new ChatMessage(
-                        "system",
-                        SYSTEM_PROMPT
-                )
+        Label texto =
+                new Label(mensagem);
+
+        texto.setWrapText(true);
+
+        texto.setMaxWidth(550);
+
+        texto.getStyleClass()
+                .add("user-message");
+
+
+        /*
+         * Ícone fica à esquerda
+         */
+
+        linha.getChildren().addAll(
+                iconeUsuario,
+                texto
         );
 
 
-        /*
-         * Limpa o campo de texto.
-         */
-
-        campoMensagem.clear();
+        chatContainer
+                .getChildren()
+                .add(linha);
 
 
-        /*
-         * Garante que a interface esteja liberada.
-         */
-
-        campoMensagem.setDisable(false);
-
-        botaoEnviar.setDisable(false);
-
-        botaoNovaConversa.setDisable(false);
+        rolarParaBaixo();
+    }
 
 
-        /*
-         * Coloca o cursor novamente no campo.
-         */
+    /*
+     * =====================================================
+     * MENSAGEM DA IA
+     * =====================================================
+     */
 
-        campoMensagem.requestFocus();
+    private void adicionarMensagemIA(String mensagem) {
 
+        VBox blocoMensagem = new VBox(5);
+        blocoMensagem.setAlignment(Pos.CENTER_RIGHT);
 
-        /*
-         * Mensagem visual indicando nova conversa.
-         */
+        // Linha da mensagem
+        HBox linhaMensagem = new HBox(10);
+        linhaMensagem.setAlignment(Pos.CENTER_RIGHT);
 
-        adicionarMensagemNaTela(
-                "Sistema",
-                "✨ Nova conversa iniciada."
+        // Texto da IA
+        Label texto = new Label(mensagem);
+        texto.setWrapText(true);
+        texto.setMaxWidth(550);
+        texto.getStyleClass().add("ai-message");
+
+        // Ícone da IA
+        Label iconeIA = new Label("🤖");
+        iconeIA.getStyleClass().add("ai-icon");
+
+        linhaMensagem.getChildren().addAll(
+                texto,
+                iconeIA
         );
+
+        // Botão copiar
+        Button botaoCopiar = new Button("📋 Copiar");
+
+        botaoCopiar.getStyleClass().add("copy-button");
+
+        botaoCopiar.setOnAction(event -> {
+
+            Clipboard clipboard =
+                    Clipboard.getSystemClipboard();
+
+            ClipboardContent content =
+                    new ClipboardContent();
+
+            content.putString(mensagem);
+
+            clipboard.setContent(content);
+
+            // Feedback visual
+            botaoCopiar.setText("✓ Copiado");
+
+            javafx.animation.PauseTransition pausa =
+                    new javafx.animation.PauseTransition(
+                            javafx.util.Duration.seconds(1.5)
+                    );
+
+            pausa.setOnFinished(e ->
+                    botaoCopiar.setText("📋 Copiar")
+            );
+
+            pausa.play();
+        });
+
+        // Adiciona mensagem + botão
+        blocoMensagem.getChildren().addAll(
+                linhaMensagem,
+                botaoCopiar
+        );
+
+        chatContainer.getChildren().add(
+                blocoMensagem
+        );
+
+        rolarParaBaixo();
     }
 
 
@@ -251,9 +310,7 @@ public class ChatController {
     ) {
 
         /*
-         * Se o usuário criou uma nova conversa enquanto
-         * a Groq ainda estava respondendo, ignoramos
-         * a resposta antiga.
+         * Ignora resposta de uma conversa antiga.
          */
 
         if (conversaDaRequisicao != idConversa) {
@@ -271,10 +328,7 @@ public class ChatController {
 
         Platform.runLater(() -> {
 
-            adicionarMensagemNaTela(
-                    "IA",
-                    resposta
-            );
+            adicionarMensagemIA(resposta);
 
             liberarInterface();
         });
@@ -283,7 +337,7 @@ public class ChatController {
 
     /*
      * =====================================================
-     * TRATAR ERRO
+     * ERRO
      * =====================================================
      */
 
@@ -291,10 +345,6 @@ public class ChatController {
             Throwable erro,
             int conversaDaRequisicao
     ) {
-
-        /*
-         * Ignora erros de uma conversa antiga.
-         */
 
         if (conversaDaRequisicao != idConversa) {
             return null;
@@ -309,9 +359,9 @@ public class ChatController {
 
         Platform.runLater(() -> {
 
-            adicionarMensagemNaTela(
-                    "Erro",
-                    causa.getMessage()
+            adicionarMensagemIA(
+                    "❌ Ocorreu um erro:\n\n"
+                            + causa.getMessage()
             );
 
             liberarInterface();
@@ -324,27 +374,73 @@ public class ChatController {
 
     /*
      * =====================================================
-     * ADICIONAR MENSAGEM NA TELA
+     * NOVA CONVERSA
      * =====================================================
      */
 
-    private void adicionarMensagemNaTela(
-            String autor,
-            String mensagem
-    ) {
+    @FXML
+    private void novaConversa() {
 
-        areaChat.appendText(
-                autor
-                        + ":\n"
-                        + mensagem
-                        + "\n\n"
+        idConversa++;
+
+
+        /*
+         * Limpa o histórico
+         */
+
+        iniciarHistorico();
+
+
+        /*
+         * Limpa a interface
+         */
+
+        chatContainer
+                .getChildren()
+                .clear();
+
+
+        /*
+         * Mensagem inicial da nova conversa
+         */
+
+        adicionarMensagemIA(
+                "🍥 Nova conversa iniciada!\n\n" +
+                        "Como posso ajudar você?"
+        );
+
+
+        campoMensagem.clear();
+
+
+        campoMensagem.setDisable(false);
+
+        botaoEnviar.setDisable(false);
+
+        botaoNovaConversa.setDisable(false);
+
+
+        campoMensagem.requestFocus();
+    }
+
+
+    /*
+     * =====================================================
+     * SCROLL AUTOMÁTICO
+     * =====================================================
+     */
+
+    private void rolarParaBaixo() {
+
+        Platform.runLater(() ->
+                chatScroll.setVvalue(1.0)
         );
     }
 
 
     /*
      * =====================================================
-     * BLOQUEAR INTERFACE
+     * BLOQUEAR
      * =====================================================
      */
 
@@ -355,10 +451,7 @@ public class ChatController {
         botaoEnviar.setDisable(true);
 
         /*
-         * Mantemos o botão Nova conversa disponível.
-         *
-         * Assim o usuário pode abandonar uma conversa
-         * mesmo enquanto a IA está processando.
+         * Nova conversa continua disponível.
          */
 
         botaoNovaConversa.setDisable(false);
@@ -367,7 +460,7 @@ public class ChatController {
 
     /*
      * =====================================================
-     * LIBERAR INTERFACE
+     * LIBERAR
      * =====================================================
      */
 
@@ -381,4 +474,5 @@ public class ChatController {
 
         campoMensagem.requestFocus();
     }
+
 }
