@@ -11,31 +11,44 @@
 
 <BorderPane
         xmlns:fx="http://javafx.com/fxml"
-        fx:controller="com.example.chatdesktop.controller.ChatController">
+        fx:controller="com.example.chatdesktop.controller.ChatController"
+        styleClass="chat-background">
+
+    <!-- TOPO -->
 
     <top>
 
-        <VBox spacing="5">
+        <HBox
+                spacing="15"
+                alignment="CENTER_LEFT"
+                styleClass="top-bar">
 
-            <padding>
-                <Insets
-                        top="20"
-                        right="20"
-                        bottom="20"
-                        left="20"/>
-            </padding>
+            <VBox
+                    spacing="5"
+                    HBox.hgrow="ALWAYS">
 
-            <Label
-                    text="Chat com IA"
-                    styleClass="titulo"/>
+                <Label
+                        text="🌀 NARUTO AI"
+                        styleClass="titulo"/>
 
-            <Label
-                    text="Groq"
-                    styleClass="modelo"/>
+                <Label
+                        text="Assistente inteligente • Groq"
+                        styleClass="modelo"/>
 
-        </VBox>
+            </VBox>
+
+            <Button
+                    fx:id="botaoNovaConversa"
+                    text="✦ Nova conversa"
+                    onAction="#novaConversa"
+                    styleClass="new-chat-button"/>
+
+        </HBox>
 
     </top>
+
+
+    <!-- CHAT -->
 
     <center>
 
@@ -43,33 +56,44 @@
                 fx:id="areaChat"
                 editable="false"
                 wrapText="true"
-                promptText="A conversa aparecerá aqui..."/>
+                promptText="A conversa aparecerá aqui..."
+                styleClass="chat-area"/>
 
     </center>
 
+
+    <!-- CAMPO DE MENSAGEM -->
+
     <bottom>
 
-        <HBox spacing="10">
+        <HBox
+                spacing="10"
+                alignment="CENTER"
+                styleClass="input-container">
 
             <padding>
+
                 <Insets
                         top="15"
                         right="15"
                         bottom="15"
                         left="15"/>
+
             </padding>
 
             <TextField
                     fx:id="campoMensagem"
                     promptText="Digite sua mensagem..."
                     HBox.hgrow="ALWAYS"
-                    onAction="#enviarMensagem"/>
+                    onAction="#enviarMensagem"
+                    styleClass="message-input"/>
 
             <Button
                     fx:id="botaoEnviar"
-                    text="Enviar"
-                    prefWidth="100"
-                    onAction="#enviarMensagem"/>
+                    text="Enviar ➤"
+                    prefWidth="110"
+                    onAction="#enviarMensagem"
+                    styleClass="send-button"/>
 
         </HBox>
 

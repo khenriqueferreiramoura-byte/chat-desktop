@@ -23,9 +23,32 @@ public class ChatController {
     @FXML
     private Button botaoEnviar;
 
+    @FXML
+    private Button botaoNovaConversa;
+
+
     private final GroqService groqService;
 
     private final List<ChatMessage> historico;
+
+
+    /*
+     * Identifica qual conversa está ativa.
+     *
+     * Isso evita que uma resposta antiga da Groq
+     * apareça depois que o usuário iniciou uma
+     * nova conversa.
+     */
+    private int idConversa = 0;
+
+
+    /*
+     * Prompt principal da IA.
+     */
+    private static final String SYSTEM_PROMPT =
+            "Você é um assistente útil, educado e objetivo. " +
+                    "Responda sempre em português do Brasil.";
+
 
     public ChatController() {
 
@@ -34,19 +57,40 @@ public class ChatController {
         this.historico = new ArrayList<>();
     }
 
+
     @FXML
     private void initialize() {
+
+        iniciarHistorico();
+
+        campoMensagem.requestFocus();
+    }
+
+
+    /*
+     * =====================================================
+     * INICIAR HISTÓRICO
+     * =====================================================
+     */
+
+    private void iniciarHistorico() {
+
+        historico.clear();
 
         historico.add(
                 new ChatMessage(
                         "system",
-                        "Você é um assistente útil, educado e objetivo. " +
-                                "Responda sempre em português do Brasil."
+                        SYSTEM_PROMPT
                 )
         );
-
-        campoMensagem.requestFocus();
     }
+
+
+    /*
+     * =====================================================
+     * ENVIAR MENSAGEM
+     * =====================================================
+     */
 
     @FXML
     private void enviarMensagem() {
@@ -56,16 +100,28 @@ public class ChatController {
                         .getText()
                         .trim();
 
+
         if (mensagem.isEmpty()) {
             return;
         }
 
+
         campoMensagem.clear();
+
+
+        /*
+         * Mostra a mensagem do usuário.
+         */
 
         adicionarMensagemNaTela(
                 "Você",
                 mensagem
         );
+
+
+        /*
+         * Adiciona ao histórico da IA.
+         */
 
         historico.add(
                 new ChatMessage(
@@ -74,17 +130,136 @@ public class ChatController {
                 )
         );
 
+
+        /*
+         * Guarda qual conversa fez a requisição.
+         */
+
+        int conversaAtual = idConversa;
+
+
         bloquearInterface();
+
 
         groqService
                 .enviarMensagem(historico)
-                .thenAccept(this::receberResposta)
-                .exceptionally(this::tratarErro);
+                .thenAccept(resposta ->
+                        receberResposta(
+                                resposta,
+                                conversaAtual
+                        )
+                )
+                .exceptionally(erro ->
+                        tratarErro(
+                                erro,
+                                conversaAtual
+                        )
+                );
     }
 
+
+    /*
+     * =====================================================
+     * NOVA CONVERSA
+     * =====================================================
+     */
+
+    @FXML
+    private void novaConversa() {
+
+        /*
+         * Cria um novo ID.
+         *
+         * Qualquer resposta da conversa anterior
+         * será considerada inválida.
+         */
+
+        idConversa++;
+
+
+        /*
+         * Limpa as mensagens da tela.
+         */
+
+        areaChat.clear();
+
+
+        /*
+         * Limpa o histórico enviado para a Groq.
+         */
+
+        historico.clear();
+
+
+        /*
+         * Adiciona novamente o prompt do sistema.
+         */
+
+        historico.add(
+                new ChatMessage(
+                        "system",
+                        SYSTEM_PROMPT
+                )
+        );
+
+
+        /*
+         * Limpa o campo de texto.
+         */
+
+        campoMensagem.clear();
+
+
+        /*
+         * Garante que a interface esteja liberada.
+         */
+
+        campoMensagem.setDisable(false);
+
+        botaoEnviar.setDisable(false);
+
+        botaoNovaConversa.setDisable(false);
+
+
+        /*
+         * Coloca o cursor novamente no campo.
+         */
+
+        campoMensagem.requestFocus();
+
+
+        /*
+         * Mensagem visual indicando nova conversa.
+         */
+
+        adicionarMensagemNaTela(
+                "Sistema",
+                "✨ Nova conversa iniciada."
+        );
+    }
+
+
+    /*
+     * =====================================================
+     * RECEBER RESPOSTA
+     * =====================================================
+     */
+
     private void receberResposta(
-            String resposta
+            String resposta,
+            int conversaDaRequisicao
     ) {
+
+        /*
+         * Se o usuário criou uma nova conversa enquanto
+         * a Groq ainda estava respondendo, ignoramos
+         * a resposta antiga.
+         */
+
+        if (conversaDaRequisicao != idConversa) {
+            return;
+        }
+
 
         historico.add(
                 new ChatMessage(
@@ -92,6 +267,7 @@ public class ChatController {
                         resposta
                 )
         );
+
 
         Platform.runLater(() -> {
 
@@ -104,13 +280,32 @@ public class ChatController {
         });
     }
 
+
+    /*
+     * =====================================================
+     * TRATAR ERRO
+     * =====================================================
+     */
+
     private Void tratarErro(
-            Throwable erro
+            Throwable erro,
+            int conversaDaRequisicao
     ) {
 
-        Throwable causa = erro.getCause() != null
-                ? erro.getCause()
-                : erro;
+        /*
+         * Ignora erros de uma conversa antiga.
+         */
+
+        if (conversaDaRequisicao != idConversa) {
+            return null;
+        }
+
+
+        Throwable causa =
+                erro.getCause() != null
+                        ? erro.getCause()
+                        : erro;
+
 
         Platform.runLater(() -> {
 
@@ -122,8 +317,16 @@ public class ChatController {
             liberarInterface();
         });
 
+
         return null;
     }
+
+
+    /*
+     * =====================================================
+     * ADICIONAR MENSAGEM NA TELA
+     * =====================================================
+     */
 
     private void adicionarMensagemNaTela(
             String autor,
@@ -138,18 +341,43 @@ public class ChatController {
         );
     }
 
+
+    /*
+     * =====================================================
+     * BLOQUEAR INTERFACE
+     * =====================================================
+     */
+
     private void bloquearInterface() {
 
         campoMensagem.setDisable(true);
 
         botaoEnviar.setDisable(true);
+
+        /*
+         * Mantemos o botão Nova conversa disponível.
+         *
+         * Assim o usuário pode abandonar uma conversa
+         * mesmo enquanto a IA está processando.
+         */
+
+        botaoNovaConversa.setDisable(false);
     }
+
+
+    /*
+     * =====================================================
+     * LIBERAR INTERFACE
+     * =====================================================
+     */
 
     private void liberarInterface() {
 
         campoMensagem.setDisable(false);
 
         botaoEnviar.setDisable(false);
+
+        botaoNovaConversa.setDisable(false);
 
         campoMensagem.requestFocus();
     }
