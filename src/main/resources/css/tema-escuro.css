@@ -1,0 +1,201 @@
+/* =====================================================
+   TEMA ESCURO
+   Orbit-IA
+   ===================================================== */
+
+.chat-background {
+    -fx-background-color: #05080f;
+}
+
+.chat-scroll {
+    -fx-background-color: #05080f;
+}
+
+.chat-scroll > .viewport {
+    -fx-background-color: #05080f;
+}
+
+.chatContainer {
+    -fx-background-color: #05080f;
+}
+
+
+/* =====================================================
+   TOPO
+   ===================================================== */
+
+.top-bar {
+    -fx-background-color:
+            linear-gradient(
+                    to right,
+                    #05070c,
+                    #0d1625,
+                    #111827,
+                    #080b12
+            );
+
+    -fx-border-color: #e85d04;
+    -fx-border-width: 0 0 2 0;
+}
+
+
+/* =====================================================
+   TÍTULO
+   ===================================================== */
+
+.titulo {
+    -fx-text-fill: #ff9d00;
+
+    -fx-effect:
+            dropshadow(
+                    gaussian,
+                    rgba(255, 100, 0, 0.9),
+                    18,
+                    0.6,
+                    0,
+                    0
+            );
+}
+
+.modelo {
+    -fx-text-fill: #a8b3c2;
+}
+
+
+/* =====================================================
+   MENSAGEM DO USUÁRIO
+   ===================================================== */
+
+.user-message {
+    -fx-background-color:
+            linear-gradient(
+                    to bottom right,
+                    #9d3d00,
+                    #5c1700
+            );
+
+    -fx-text-fill: white;
+
+    -fx-border-color: #ff8c00;
+}
+
+
+/* =====================================================
+   MENSAGEM DA IA
+   ===================================================== */
+
+.ai-message {
+    -fx-background-color:
+            linear-gradient(
+                    to bottom right,
+                    #111c2c,
+                    #0a111d
+            );
+
+    -fx-text-fill: #e8edf4;
+
+    -fx-border-color: #263a52;
+}
+
+
+/* =====================================================
+   ÁREA INFERIOR
+   ===================================================== */
+
+.input-container {
+    -fx-background-color:
+            linear-gradient(
+                    to right,
+                    #080b12,
+                    #0d1420,
+                    #080b12
+            );
+
+    -fx-border-color: #263a52;
+}
+
+
+/* =====================================================
+   CAMPO DE MENSAGEM
+   ===================================================== */
+
+.message-input {
+    -fx-background-color: #090f18;
+
+    -fx-text-fill: white;
+
+    -fx-prompt-text-fill: #667085;
+
+    -fx-border-color: #29384b;
+}
+
+.message-input:focused {
+    -fx-border-color: #ff9d00;
+}
+
+
+/* =====================================================
+   BOTÃO COPIAR
+   ===================================================== */
+
+.copy-button {
+    -fx-background-color: transparent;
+
+    -fx-text-fill: #8b9bb0;
+
+    -fx-border-color: #334155;
+}
+
+.copy-button:hover {
+    -fx-background-color: #182333;
+
+    -fx-text-fill: white;
+
+    -fx-border-color: #ff9d00;
+}
+
+
+/* =====================================================
+   SCROLLBAR
+   ===================================================== */
+
+.chat-scroll .scroll-bar:vertical {
+    -fx-background-color: #080b12;
+}
+
+.chat-scroll .scroll-bar:vertical .thumb {
+    -fx-background-color: #263a52;
+}
+
+.chat-scroll .scroll-bar:vertical .thumb:hover {
+    -fx-background-color: #ff8c00;
+}
+
+
+/* =====================================================
+   BOTÃO TEMA
+   ===================================================== */
+
+.theme-button {
+    -fx-background-color: #111827;
+
+    -fx-text-fill: #f8fafc;
+
+    -fx-border-color: #334155;
+
+    -fx-border-radius: 10;
+
+    -fx-background-radius: 10;
+
+    -fx-padding: 9 12 9 12;
+
+    -fx-font-size: 16px;
+
+    -fx-cursor: hand;
+}
+
+.theme-button:hover {
+    -fx-background-color: #1e293b;
+
+    -fx-border-color: #ff9d00;
+}

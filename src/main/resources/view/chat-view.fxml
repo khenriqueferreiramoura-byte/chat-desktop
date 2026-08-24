@@ -45,6 +45,12 @@
                     onAction="#novaConversa"
                     styleClass="new-chat-button"/>
 
+            <Button
+                    fx:id="botaoTema"
+                    text="☀"
+                    onAction="#alternarTema"
+                    styleClass="theme-button"/>
+
         </HBox>
 
     </top>

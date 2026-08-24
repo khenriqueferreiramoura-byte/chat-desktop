@@ -493,5 +493,55 @@ public class ChatController {
 
         campoMensagem.requestFocus();
     }
+    @FXML
+    private Button botaoTema;
+    private boolean temaEscuro = true;
 
+    private static final String CSS_TEMA_CLARO =
+            "/css/tema-claro.css";
+
+    private static final String CSS_TEMA_ESCURO =
+            "/css/tema-escuro.css";
+
+@FXML
+private void alternarTema() {
+
+    if (chatContainer.getScene() == null) {
+        return;
+    }
+
+    var scene = chatContainer.getScene();
+
+    String temaAtual = temaEscuro
+            ? CSS_TEMA_ESCURO
+            : CSS_TEMA_CLARO;
+
+    String novoTema = temaEscuro
+            ? CSS_TEMA_CLARO
+            : CSS_TEMA_ESCURO;
+
+    String urlTemaAtual =
+            getClass()
+                    .getResource(temaAtual)
+                    .toExternalForm();
+
+    String urlNovoTema =
+            getClass()
+                    .getResource(novoTema)
+                    .toExternalForm();
+
+    scene.getStylesheets().remove(
+            urlTemaAtual
+    );
+
+    scene.getStylesheets().add(
+            urlNovoTema
+    );
+
+    temaEscuro = !temaEscuro;
+
+    botaoTema.setText(
+            temaEscuro ? "☀" : "🌙"
+    );
+}
 }

@@ -1,0 +1,215 @@
+/* =====================================================
+   TEMA CLARO
+   Orbit-IA
+   ===================================================== */
+
+.chat-background {
+    -fx-background-color: #f1f5f9;
+}
+
+.chat-scroll {
+    -fx-background-color: #f1f5f9;
+}
+
+.chat-scroll > .viewport {
+    -fx-background-color: #f1f5f9;
+}
+
+.chatContainer {
+    -fx-background-color: #f1f5f9;
+}
+
+
+/* =====================================================
+   TOPO
+   ===================================================== */
+
+.top-bar {
+    -fx-background-color:
+            linear-gradient(
+                    to right,
+                    #ffffff,
+                    #f8fafc,
+                    #e2e8f0
+            );
+
+    -fx-border-color: #e85d04;
+    -fx-border-width: 0 0 2 0;
+}
+
+
+/* =====================================================
+   TÍTULO
+   ===================================================== */
+
+.titulo {
+    -fx-text-fill: #c2410c;
+
+    -fx-effect:
+            dropshadow(
+                    gaussian,
+                    rgba(194, 65, 12, 0.25),
+                    8,
+                    0.3,
+                    0,
+                    0
+            );
+}
+
+.modelo {
+    -fx-text-fill: #64748b;
+}
+
+
+/* =====================================================
+   MENSAGEM DO USUÁRIO
+   ===================================================== */
+
+.user-message {
+    -fx-background-color:
+            linear-gradient(
+                    to bottom right,
+                    #fed7aa,
+                    #fdba74
+            );
+
+    -fx-text-fill: #431407;
+
+    -fx-border-color: #ea580c;
+}
+
+
+/* =====================================================
+   MENSAGEM DA IA
+   ===================================================== */
+
+.ai-message {
+    -fx-background-color: #ffffff;
+
+    -fx-text-fill: #1e293b;
+
+    -fx-border-color: #cbd5e1;
+
+    -fx-effect:
+            dropshadow(
+                    gaussian,
+                    rgba(15, 23, 42, 0.12),
+                    8,
+                    0.2,
+                    0,
+                    2
+            );
+}
+
+
+/* =====================================================
+   ÁREA INFERIOR
+   ===================================================== */
+
+.input-container {
+    -fx-background-color:
+            linear-gradient(
+                    to right,
+                    #ffffff,
+                    #f8fafc,
+                    #ffffff
+            );
+
+    -fx-border-color: #cbd5e1;
+}
+
+
+/* =====================================================
+   CAMPO DE MENSAGEM
+   ===================================================== */
+
+.message-input {
+    -fx-background-color: white;
+
+    -fx-text-fill: #1e293b;
+
+    -fx-prompt-text-fill: #94a3b8;
+
+    -fx-border-color: #cbd5e1;
+}
+
+.message-input:focused {
+    -fx-border-color: #ea580c;
+
+    -fx-effect:
+            dropshadow(
+                    gaussian,
+                    rgba(234, 88, 12, 0.25),
+                    8,
+                    0.3,
+                    0,
+                    0
+            );
+}
+
+
+/* =====================================================
+   BOTÃO COPIAR
+   ===================================================== */
+
+.copy-button {
+    -fx-background-color: transparent;
+
+    -fx-text-fill: #64748b;
+
+    -fx-border-color: #cbd5e1;
+}
+
+.copy-button:hover {
+    -fx-background-color: #f1f5f9;
+
+    -fx-text-fill: #0f172a;
+
+    -fx-border-color: #ea580c;
+}
+
+
+/* =====================================================
+   SCROLLBAR
+   ===================================================== */
+
+.chat-scroll .scroll-bar:vertical {
+    -fx-background-color: #e2e8f0;
+}
+
+.chat-scroll .scroll-bar:vertical .thumb {
+    -fx-background-color: #94a3b8;
+}
+
+.chat-scroll .scroll-bar:vertical .thumb:hover {
+    -fx-background-color: #ea580c;
+}
+
+
+/* =====================================================
+   BOTÃO TEMA
+   ===================================================== */
+
+.theme-button {
+    -fx-background-color: #ffffff;
+
+    -fx-text-fill: #334155;
+
+    -fx-border-color: #cbd5e1;
+
+    -fx-border-radius: 10;
+
+    -fx-background-radius: 10;
+
+    -fx-padding: 9 12 9 12;
+
+    -fx-font-size: 16px;
+
+    -fx-cursor: hand;
+}
+
+.theme-button:hover {
+    -fx-background-color: #f8fafc;
+
+    -fx-border-color: #ea580c;
+}
