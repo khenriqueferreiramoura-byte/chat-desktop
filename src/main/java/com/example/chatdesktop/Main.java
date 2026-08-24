@@ -30,6 +30,9 @@ public class Main extends Application {
                 600
         );
 
+        /*
+         * CSS estrutural
+         */
         URL css = Main.class.getResource(
                 "/css/chat.css"
         );
@@ -40,7 +43,20 @@ public class Main extends Application {
             );
         }
 
-        stage.setTitle("Chat JavaFX + Groq");
+        /*
+         * Tema inicial
+         */
+        URL temaEscuro = Main.class.getResource(
+                "/css/tema-escuro.css"
+        );
+
+        if (temaEscuro != null) {
+            scene.getStylesheets().add(
+                    temaEscuro.toExternalForm()
+            );
+        }
+
+        stage.setTitle("Orbit-IA");
         stage.setScene(scene);
         stage.show();
     }

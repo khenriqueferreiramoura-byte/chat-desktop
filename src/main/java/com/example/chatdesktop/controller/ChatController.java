@@ -350,23 +350,42 @@ public class ChatController {
             return null;
         }
 
+        Throwable causa = erro;
 
-        Throwable causa =
-                erro.getCause() != null
-                        ? erro.getCause()
-                        : erro;
+        /*
+         * Remove CompletionException,
+         * caso exista.
+         */
+        while (causa.getCause() != null
+                && causa.getClass()
+                .getName()
+                .contains("CompletionException")) {
 
+            causa = causa.getCause();
+        }
+
+        String mensagem = causa.getMessage();
+
+        /*
+         * Caso o erro não possua mensagem.
+         */
+        if (mensagem == null || mensagem.isBlank()) {
+
+            mensagem =
+                    "❌ Não foi possível concluir a solicitação.\n\n"
+                            + "Tente novamente.";
+        }
+
+        final String mensagemFinal = mensagem;
 
         Platform.runLater(() -> {
 
             adicionarMensagemIA(
-                    "❌ Ocorreu um erro:\n\n"
-                            + causa.getMessage()
+                    mensagemFinal
             );
 
             liberarInterface();
         });
-
 
         return null;
     }
