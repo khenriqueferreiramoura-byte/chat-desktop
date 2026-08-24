@@ -16,6 +16,10 @@ import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import java.util.ArrayList;
 import java.util.List;
+import javafx.application.Platform;
+import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 
 public class ChatController {
 
@@ -60,16 +64,21 @@ public class ChatController {
     private void initialize() {
 
         iniciarHistorico();
+        
 
         adicionarMensagemIA(
-                "🍥 Seja bem-vindo ao Naruto AI!\n\n" +
+                "🍥 Seja bem-vindo á inteligencia Artificial da Orbit!\n\n" +
                         "Estou pronto para conversar com você. " +
                         "Faça uma pergunta, peça uma explicação " +
                         "ou comece uma nova conversa."
+                
         );
 
         campoMensagem.requestFocus();
+        Platform.runLater(this::configurarAtalhos);
     }
+
+
 
 
     /*
@@ -544,4 +553,62 @@ private void alternarTema() {
             temaEscuro ? "☀" : "🌙"
     );
 }
+    private void configurarAtalhos() {
+
+        Scene scene = chatContainer.getScene();
+
+        if (scene == null) {
+            return;
+        }
+
+        scene.addEventFilter(
+                KeyEvent.KEY_PRESSED,
+                evento -> {
+
+                    // ==========================================
+                    // ENTER → ENVIAR MENSAGEM
+                    // ==========================================
+
+                    if (evento.getCode() == KeyCode.ENTER
+                            && !evento.isControlDown()
+                            && !evento.isShiftDown()
+                            && !evento.isAltDown()) {
+
+                        enviarMensagem();
+
+                        evento.consume();
+
+                        return;
+                    }
+
+
+                    // ==========================================
+                    // CTRL + N → NOVA CONVERSA
+                    // ==========================================
+
+                    if (evento.isControlDown()
+                            && evento.getCode() == KeyCode.N) {
+
+                        novaConversa();
+
+                        evento.consume();
+
+                        return;
+                    }
+
+
+                    // ==========================================
+                    // CTRL + L → LIMPAR CAMPO
+                    // ==========================================
+
+                    if (evento.isControlDown()
+                            && evento.getCode() == KeyCode.L) {
+
+                        campoMensagem.clear();
+
+                        evento.consume();
+                    }
+                }
+        );
+    }
 }
