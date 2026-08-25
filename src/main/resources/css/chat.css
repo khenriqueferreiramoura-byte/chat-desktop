@@ -33,7 +33,7 @@
                     #080b12
             );
 
-    -fx-border-color: #e85d04;
+    -fx-border-color: #701aef;
     -fx-border-width: 0 0 2 0;
 
     -fx-padding: 15 20 15 20;
@@ -45,7 +45,7 @@
    ===================================================== */
 
 .titulo {
-    -fx-text-fill: #ff9d00;
+    -fx-text-fill: #fd0303;
 
     -fx-font-family: "Segoe UI";
 
@@ -72,7 +72,7 @@
    ===================================================== */
 
 .modelo {
-    -fx-text-fill: #a8b3c2;
+    -fx-text-fill: #1674ea;
 
     -fx-font-family: "Segoe UI";
 
