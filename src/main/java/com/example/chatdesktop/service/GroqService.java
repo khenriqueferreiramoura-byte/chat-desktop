@@ -9,8 +9,8 @@ import com.google.gson.JsonParser;
 
 import java.io.IOException;
 import java.net.ConnectException;
-import java.net.UnknownHostException;
 import java.net.URI;
+import java.net.UnknownHostException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -27,12 +27,19 @@ public class GroqService {
 
     public GroqService() {
 
-        this.httpClient = HttpClient.newBuilder()
-                .connectTimeout(Duration.ofSeconds(20))
-                .build();
+        this.httpClient =
+                HttpClient.newBuilder()
+                        .connectTimeout(
+                                Duration.ofSeconds(20)
+                        )
+                        .build();
 
         this.gson = new Gson();
     }
+
+    // =====================================================
+    // CHAT NORMAL / RAG
+    // =====================================================
 
     public CompletableFuture<String> enviarMensagem(
             List<ChatMessage> historico
@@ -40,40 +47,61 @@ public class GroqService {
 
         try {
 
-            String apiKey = GroqConfig.getApiKey();
+            String apiKey =
+                    GroqConfig.getApiKey();
 
-            String json = criarRequest(historico);
+            String json =
+                    criarRequest(
+                            historico,
+                            GroqConfig.MODEL
+                    );
 
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(GroqConfig.API_URL))
-                    .timeout(Duration.ofSeconds(60))
-                    .header(
-                            "Authorization",
-                            "Bearer " + apiKey
-                    )
-                    .header(
-                            "Content-Type",
-                            "application/json"
-                    )
-                    .POST(
-                            HttpRequest.BodyPublishers.ofString(json)
-                    )
-                    .build();
+            HttpRequest request =
+                    HttpRequest.newBuilder()
+                            .uri(
+                                    URI.create(
+                                            GroqConfig.API_URL
+                                    )
+                            )
+                            .timeout(
+                                    Duration.ofSeconds(60)
+                            )
+                            .header(
+                                    "Authorization",
+                                    "Bearer " + apiKey
+                            )
+                            .header(
+                                    "Content-Type",
+                                    "application/json"
+                            )
+                            .POST(
+                                    HttpRequest.BodyPublishers
+                                            .ofString(json)
+                            )
+                            .build();
 
             return httpClient
                     .sendAsync(
                             request,
                             HttpResponse.BodyHandlers.ofString()
                     )
-                    .thenApply(this::processarResposta)
-                    .exceptionallyCompose(erro -> {
+                    .thenApply(
+                            this::processarResposta
+                    )
+                    .exceptionallyCompose(
+                            erro -> {
 
-                        Throwable causa = obterCausa(erro);
+                                Throwable causa =
+                                        obterCausa(erro);
 
-                        return CompletableFuture.failedFuture(
-                                criarErroAmigavel(causa)
-                        );
-                    });
+                                return CompletableFuture
+                                        .failedFuture(
+                                                criarErroAmigavel(
+                                                        causa
+                                                )
+                                        );
+                            }
+                    );
 
         } catch (Exception erro) {
 
@@ -83,22 +111,324 @@ public class GroqService {
         }
     }
 
-    private String criarRequest(
-            List<ChatMessage> historico
+    // =====================================================
+    // PESQUISA NA INTERNET
+    // =====================================================
+
+    public CompletableFuture<String> pesquisarNaInternet(
+            String pergunta
     ) {
 
-        JsonObject request = new JsonObject();
+        if (pergunta == null ||
+                pergunta.isBlank()) {
+
+            return CompletableFuture.completedFuture(
+                    "Não foi possível realizar a pesquisa."
+            );
+        }
+
+        try {
+
+            String apiKey =
+                    GroqConfig.getApiKey();
+
+            /*
+             * =================================================
+             * SYSTEM PROMPT
+             * =================================================
+             */
+
+            ChatMessage system =
+                    new ChatMessage(
+                            "system",
+                            """
+                            Você é a Orbit-IA.
+
+                            A base de conhecimento local não encontrou
+                            informações suficientemente relevantes para
+                            responder à pergunta.
+
+                            Agora utilize a pesquisa na internet para
+                            encontrar informações atuais e relevantes.
+
+                            REGRAS:
+
+                            - Responda em português do Brasil.
+                            - Faça uma pesquisa superficial e objetiva.
+                            - Priorize fontes confiáveis.
+                            - Prefira informações recentes quando a pergunta
+                              depender de atualidade.
+                            - Não invente informações.
+                            - Não apresente especulações como fatos.
+                            - Utilize as informações encontradas na pesquisa.
+                            - Se as fontes não forem suficientes, diga isso.
+                            - Seja objetivo.
+                            - Não faça uma pesquisa excessivamente profunda.
+                            - Responda diretamente à pergunta do usuário.
+
+                            A pesquisa web deve ser utilizada para complementar
+                            a resposta quando a base local não possuir
+                            informações suficientes.
+                            """
+                    );
+
+            ChatMessage user =
+                    new ChatMessage(
+                            "user",
+                            pergunta
+                    );
+
+            List<ChatMessage> mensagens =
+                    List.of(
+                            system,
+                            user
+                    );
+
+            /*
+             * =================================================
+             * REQUEST COM COMPOUND MINI
+             * =================================================
+             */
+
+            String json =
+                    criarRequestWeb(
+                            mensagens
+                    );
+
+            HttpRequest request =
+                    HttpRequest.newBuilder()
+                            .uri(
+                                    URI.create(
+                                            GroqConfig.API_URL
+                                    )
+                            )
+                            .timeout(
+                                    Duration.ofSeconds(90)
+                            )
+                            .header(
+                                    "Authorization",
+                                    "Bearer " + apiKey
+                            )
+                            .header(
+                                    "Content-Type",
+                                    "application/json"
+                            )
+                            .header(
+                                    "Groq-Model-Version",
+                                    "latest"
+                            )
+                            .POST(
+                                    HttpRequest.BodyPublishers
+                                            .ofString(json)
+                            )
+                            .build();
+
+            System.out.println();
+            System.out.println(
+                    "========================================"
+            );
+            System.out.println(
+                    "🌐 PESQUISA WEB ATIVADA"
+            );
+            System.out.println(
+                    "Modelo: "
+                            + GroqConfig.WEB_MODEL
+            );
+            System.out.println(
+                    "Pergunta: "
+                            + pergunta
+            );
+            System.out.println(
+                    "========================================"
+            );
+
+            return httpClient
+                    .sendAsync(
+                            request,
+                            HttpResponse.BodyHandlers.ofString()
+                    )
+                    .thenApply(
+                            response -> {
+
+                                System.out.println(
+                                        "🌐 Resposta recebida da pesquisa web."
+                                );
+
+                                return processarResposta(
+                                        response
+                                );
+                            }
+                    )
+                    .exceptionallyCompose(
+                            erro -> {
+
+                                Throwable causa =
+                                        obterCausa(erro);
+
+                                return CompletableFuture
+                                        .failedFuture(
+                                                criarErroAmigavel(
+                                                        causa
+                                                )
+                                        );
+                            }
+                    );
+
+        } catch (Exception erro) {
+
+            return CompletableFuture.failedFuture(
+                    criarErroAmigavel(erro)
+            );
+        }
+    }
+
+    // =====================================================
+    // REQUEST NORMAL
+    // =====================================================
+
+    private String criarRequest(
+            List<ChatMessage> historico,
+            String modelo
+    ) {
+
+        JsonObject request =
+                new JsonObject();
 
         request.addProperty(
                 "model",
-                GroqConfig.MODEL
+                modelo
         );
 
-        JsonArray messages = new JsonArray();
+        JsonArray messages =
+                criarMensagensJson(
+                        historico
+                );
 
-        for (ChatMessage mensagem : historico) {
+        request.add(
+                "messages",
+                messages
+        );
 
-            JsonObject message = new JsonObject();
+        return gson.toJson(request);
+    }
+
+    // =====================================================
+    // REQUEST WEB
+    // =====================================================
+
+    private String criarRequestWeb(
+            List<ChatMessage> mensagens
+    ) {
+
+        JsonObject request =
+                new JsonObject();
+
+        /*
+         * Modelo Compound Mini
+         */
+        request.addProperty(
+                "model",
+                GroqConfig.WEB_MODEL
+        );
+
+        /*
+         * Mensagens
+         */
+        request.add(
+                "messages",
+                criarMensagensJson(
+                        mensagens
+                )
+        );
+
+        /*
+         * =================================================
+         * COMPOUND CUSTOM
+         * =================================================
+         */
+
+        JsonObject compoundCustom =
+                new JsonObject();
+
+        JsonObject tools =
+                new JsonObject();
+
+        JsonArray enabledTools =
+                new JsonArray();
+
+        /*
+         * Somente pesquisa web.
+         *
+         * Não habilitamos:
+         *
+         * code_interpreter
+         * visit_website
+         * wolfram_alpha
+         */
+
+        enabledTools.add(
+                "web_search"
+        );
+
+        tools.add(
+                "enabled_tools",
+                enabledTools
+        );
+
+        compoundCustom.add(
+                "tools",
+                tools
+        );
+
+        request.add(
+                "compound_custom",
+                compoundCustom
+        );
+
+        /*
+         * =================================================
+         * CONFIGURAÇÃO DA PESQUISA
+         * =================================================
+         */
+
+        JsonObject searchSettings =
+                new JsonObject();
+
+        /*
+         * Prioriza resultados brasileiros.
+         */
+        searchSettings.addProperty(
+                "country",
+                "brazil"
+        );
+
+        /*
+         * Mantém a pesquisa ampla.
+         */
+        request.add(
+                "search_settings",
+                searchSettings
+        );
+
+        return gson.toJson(request);
+    }
+
+    // =====================================================
+    // MENSAGENS JSON
+    // =====================================================
+
+    private JsonArray criarMensagensJson(
+            List<ChatMessage> mensagens
+    ) {
+
+        JsonArray messages =
+                new JsonArray();
+
+        for (ChatMessage mensagem :
+                mensagens) {
+
+            JsonObject message =
+                    new JsonObject();
 
             message.addProperty(
                     "role",
@@ -110,41 +440,49 @@ public class GroqService {
                     mensagem.getContent()
             );
 
-            messages.add(message);
+            messages.add(
+                    message
+            );
         }
 
-        request.add(
-                "messages",
-                messages
-        );
-
-        return gson.toJson(request);
+        return messages;
     }
+
+    // =====================================================
+    // PROCESSAR RESPOSTA
+    // =====================================================
 
     private String processarResposta(
             HttpResponse<String> response
     ) {
 
-        int status = response.statusCode();
+        int status =
+                response.statusCode();
 
-        /*
-         * ==========================================
-         * RESPOSTA COM SUCESSO
-         * ==========================================
-         */
+        System.out.println(
+                "HTTP status: "
+                        + status
+        );
 
-        if (status >= 200 && status < 300) {
+        if (status >= 200 &&
+                status < 300) {
 
             try {
 
-                JsonObject json = JsonParser
-                        .parseString(response.body())
-                        .getAsJsonObject();
+                JsonObject json =
+                        JsonParser
+                                .parseString(
+                                        response.body()
+                                )
+                                .getAsJsonObject();
 
                 JsonArray choices =
-                        json.getAsJsonArray("choices");
+                        json.getAsJsonArray(
+                                "choices"
+                        );
 
-                if (choices == null || choices.isEmpty()) {
+                if (choices == null ||
+                        choices.isEmpty()) {
 
                     throw new RuntimeException(
                             "A IA não retornou nenhuma resposta."
@@ -157,29 +495,57 @@ public class GroqService {
                                 .getAsJsonObject();
 
                 JsonObject message =
-                        choice.getAsJsonObject("message");
+                        choice.getAsJsonObject(
+                                "message"
+                        );
 
-                if (message == null
-                        || !message.has("content")) {
+                if (message == null ||
+                        !message.has("content")) {
 
                     throw new RuntimeException(
                             "A resposta da IA não possui conteúdo."
                     );
                 }
 
-                return message
-                        .get("content")
-                        .getAsString();
+                String resposta =
+                        message
+                                .get("content")
+                                .getAsString();
+
+                if (resposta == null ||
+                        resposta.isBlank()) {
+
+                    throw new RuntimeException(
+                            "A IA retornou uma resposta vazia."
+                    );
+                }
+
+                return resposta.trim();
 
             } catch (Exception erro) {
 
                 if (erro instanceof RuntimeException
                         && erro.getMessage() != null
-                        && erro.getMessage().contains(
-                        "A IA não retornou")) {
+                        && (
+                        erro.getMessage().contains(
+                                "A IA não retornou"
+                        )
+                                ||
+                                erro.getMessage().contains(
+                                        "A resposta da IA"
+                                )
+                )) {
 
                     throw erro;
                 }
+
+                System.err.println(
+                        "Resposta recebida:"
+                );
+
+                System.err.println(
+                        response.body()
+                );
 
                 throw new RuntimeException(
                         "Não foi possível interpretar "
@@ -188,213 +554,149 @@ public class GroqService {
             }
         }
 
-        /*
-         * ==========================================
-         * ERROS HTTP
-         * ==========================================
-         */
-
         throw new GroqApiException(
                 status,
-                obterMensagemPorStatus(status)
+                obterMensagemPorStatus(
+                        status
+                )
         );
     }
 
-    private String obterMensagemPorStatus(int status) {
+    // =====================================================
+    // STATUS HTTP
+    // =====================================================
+
+    private String obterMensagemPorStatus(
+            int status
+    ) {
 
         return switch (status) {
 
-            /*
-             * 400
-             */
             case 400 ->
-                    "A solicitação enviada para a IA "
-                            + "é inválida.";
+                    "A solicitação enviada para a IA é inválida.";
 
-            /*
-             * 401
-             */
             case 401 ->
-                    "A chave da API da Groq é inválida "
-                            + "ou não foi autorizada.";
+                    "A chave da API da Groq é inválida ou não foi autorizada.";
 
-            /*
-             * 403
-             */
             case 403 ->
-                    "Acesso à API não autorizado. "
-                            + "Verifique sua chave da Groq.";
+                    "Acesso à API não autorizado. Verifique sua chave da Groq.";
 
-            /*
-             * 404
-             */
             case 404 ->
-                    "O modelo da IA não foi encontrado. "
-                            + "Verifique a configuração do modelo.";
+                    "O modelo da IA não foi encontrado.";
 
-            /*
-             * 408
-             */
             case 408 ->
-                    "A solicitação demorou muito para responder. "
-                            + "Tente novamente.";
+                    "A solicitação demorou muito para responder.";
 
-            /*
-             * 429
-             */
             case 429 ->
                     "O limite de requisições da API foi atingido.\n\n"
                             + "Aguarde alguns instantes e tente novamente.";
 
-            /*
-             * 500
-             */
             case 500 ->
-                    "O servidor da Groq apresentou um erro interno.\n\n"
-                            + "Tente novamente em alguns instantes.";
+                    "O servidor da Groq apresentou um erro interno.";
 
-            /*
-             * 502
-             */
             case 502 ->
-                    "O servidor da Groq está temporariamente "
-                            + "indisponível.\n\n"
-                            + "Tente novamente mais tarde.";
+                    "O servidor da Groq está temporariamente indisponível.";
 
-            /*
-             * 503
-             */
             case 503 ->
-                    "O serviço da Groq está temporariamente "
-                            + "indisponível.\n\n"
-                            + "Tente novamente mais tarde.";
+                    "O serviço da Groq está temporariamente indisponível.";
 
-            /*
-             * 504
-             */
             case 504 ->
-                    "O servidor demorou muito para responder.\n\n"
-                            + "Tente novamente.";
+                    "O servidor demorou muito para responder.";
 
-            /*
-             * Outros códigos
-             */
             default ->
                     "Não foi possível comunicar com a API da Groq.\n\n"
-                            + "Código do erro: " + status;
+                            + "Código do erro: "
+                            + status;
         };
     }
 
-    private Throwable obterCausa(Throwable erro) {
+    // =====================================================
+    // CAUSA REAL
+    // =====================================================
 
-        Throwable atual = erro;
+    private Throwable obterCausa(
+            Throwable erro
+    ) {
 
-        while (atual instanceof CompletionException
-                && atual.getCause() != null) {
+        Throwable atual =
+                erro;
 
-            atual = atual.getCause();
+        while (
+                (atual instanceof CompletionException
+                        || atual instanceof RuntimeException)
+                        && atual.getCause() != null
+        ) {
+
+            atual =
+                    atual.getCause();
         }
 
         return atual;
     }
 
+    // =====================================================
+    // ERROS AMIGÁVEIS
+    // =====================================================
+
     private RuntimeException criarErroAmigavel(
             Throwable erro
     ) {
 
-        /*
-         * ==========================================
-         * ERRO DA API
-         * ==========================================
-         */
+        if (erro == null) {
+
+            return new RuntimeException(
+                    "❌ Ocorreu um erro desconhecido."
+            );
+        }
 
         if (erro instanceof GroqApiException) {
 
             return (GroqApiException) erro;
         }
 
-        /*
-         * ==========================================
-         * SEM INTERNET
-         * ==========================================
-         */
-
         if (erro instanceof UnknownHostException) {
 
             return new RuntimeException(
                     "🌐 Não foi possível acessar a internet.\n\n"
-                            + "Verifique sua conexão com a internet "
-                            + "e tente novamente."
-            );
-        }
-
-        /*
-         * ==========================================
-         * FALHA DE CONEXÃO
-         * ==========================================
-         */
-
-        if (erro instanceof ConnectException) {
-
-            return new RuntimeException(
-                    "📡 Não foi possível conectar ao servidor da IA.\n\n"
-                            + "Verifique sua conexão com a internet "
-                            + "e tente novamente."
-            );
-        }
-
-        /*
-         * ==========================================
-         * TIMEOUT
-         * ==========================================
-         */
-
-        if (erro instanceof HttpTimeoutException) {
-
-            return new RuntimeException(
-                    "⏱️ A comunicação com a IA demorou muito.\n\n"
                             + "Verifique sua conexão e tente novamente."
             );
         }
 
-        /*
-         * ==========================================
-         * OUTRAS FALHAS DE INTERNET
-         * ==========================================
-         */
+        if (erro instanceof ConnectException) {
+
+            return new RuntimeException(
+                    "📡 Não foi possível conectar ao servidor.\n\n"
+                            + "Verifique sua conexão com a internet."
+            );
+        }
+
+        if (erro instanceof HttpTimeoutException) {
+
+            return new RuntimeException(
+                    "⏱️ A pesquisa demorou muito para responder.\n\n"
+                            + "Tente novamente."
+            );
+        }
 
         if (erro instanceof IOException) {
 
             return new RuntimeException(
-                    "📡 Ocorreu uma falha de comunicação com a IA.\n\n"
+                    "📡 Ocorreu uma falha de comunicação.\n\n"
                             + "Verifique sua internet e tente novamente."
             );
         }
 
-        /*
-         * ==========================================
-         * API KEY NÃO CONFIGURADA
-         * ==========================================
-         */
-
         if (erro instanceof IllegalStateException
                 && erro.getMessage() != null
                 && erro.getMessage().contains(
-                "GROQ_API_KEY")) {
+                "GROQ_API_KEY"
+        )) {
 
             return new RuntimeException(
-                    "🔑 A chave da API da Groq "
-                            + "não foi configurada.\n\n"
-                            + "Configure a variável de ambiente "
-                            + "GROQ_API_KEY e reinicie a aplicação."
+                    "🔑 A chave da API da Groq não foi configurada.\n\n"
+                            + "Configure GROQ_API_KEY e reinicie a aplicação."
             );
         }
-
-        /*
-         * ==========================================
-         * ERRO DESCONHECIDO
-         * ==========================================
-         */
 
         return new RuntimeException(
                 "❌ Ocorreu um erro ao comunicar com a IA.\n\n"
@@ -402,11 +704,9 @@ public class GroqService {
         );
     }
 
-    /*
-     * ==============================================
-     * EXCEÇÃO ESPECÍFICA DA API GROQ
-     * ==============================================
-     */
+    // =====================================================
+    // EXCEÇÃO GROQ
+    // =====================================================
 
     private static class GroqApiException
             extends RuntimeException {
@@ -420,10 +720,12 @@ public class GroqService {
 
             super(message);
 
-            this.statusCode = statusCode;
+            this.statusCode =
+                    statusCode;
         }
 
         public int getStatusCode() {
+
             return statusCode;
         }
     }

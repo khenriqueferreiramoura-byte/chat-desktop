@@ -339,6 +339,16 @@ public class ChatController {
         // RAG
         // =================================================
 
+
+
+                // =================================================
+                // RESPOSTA
+                // =================================================
+
+        // =====================================================
+// RAG → WEB FALLBACK
+// =====================================================
+
         CompletableFuture
                 .supplyAsync(() ->
                         rag.criarContexto(
@@ -347,30 +357,56 @@ public class ChatController {
                         )
                 )
 
-
                 // =================================================
-                // MONTA PROMPT
-                // =================================================
-
-                .thenApply(contexto ->
-                        criarMensagensParaIA(
-                                texto,
-                                contexto
-                        )
-                )
-
-
-                // =================================================
-                // GROQ
+                // DECISÃO
                 // =================================================
 
-                .thenCompose(
-                        groq::enviarMensagem
-                )
+                .thenCompose(contexto -> {
 
+                    // =================================================
+                    // RAG ENCONTROU
+                    // =================================================
+
+                    if (contexto != null &&
+                            !contexto.isBlank()) {
+
+                        System.out.println();
+                        System.out.println(
+                                "📚 RAG encontrou informações."
+                        );
+
+                        System.out.println(
+                                "📚 Utilizando documentos locais."
+                        );
+
+                        return groq.enviarMensagem(
+                                criarMensagensParaIA(
+                                        texto,
+                                        contexto
+                                )
+                        );
+                    }
+
+                    // =================================================
+                    // RAG NÃO ENCONTROU
+                    // =================================================
+
+                    System.out.println();
+                    System.out.println(
+                            "🌐 RAG não encontrou informações suficientes."
+                    );
+
+                    System.out.println(
+                            "🌐 Ativando pesquisa na internet."
+                    );
+
+                    return groq.pesquisarNaInternet(
+                            texto
+                    );
+                })
 
                 // =================================================
-                // RESPOSTA
+                // RESPOSTA FINAL
                 // =================================================
 
                 .thenAccept(resposta -> {
@@ -379,14 +415,12 @@ public class ChatController {
                         return;
                     }
 
-
                     historico.add(
                             new ChatMessage(
                                     "assistant",
                                     resposta
                             )
                     );
-
 
                     Platform.runLater(() -> {
 
@@ -398,7 +432,6 @@ public class ChatController {
                     });
                 })
 
-
                 // =================================================
                 // ERRO
                 // =================================================
@@ -409,20 +442,21 @@ public class ChatController {
                         return null;
                     }
 
+                    Throwable causa =
+                            obterCausa(
+                                    erro
+                            );
 
                     Platform.runLater(() -> {
 
                         adicionarIA(
                                 erroAmigavel(
-                                        obterCausa(
-                                                erro
-                                        )
+                                        causa
                                 )
                         );
 
                         liberar();
                     });
-
 
                     return null;
                 });

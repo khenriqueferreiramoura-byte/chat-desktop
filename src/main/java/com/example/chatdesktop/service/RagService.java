@@ -110,7 +110,7 @@ public class RagService {
                             + score
             );
 
-            if (score > 0) {
+            if (score >= 0.60) {
 
                 resultados.add(
                         new RagResult(
