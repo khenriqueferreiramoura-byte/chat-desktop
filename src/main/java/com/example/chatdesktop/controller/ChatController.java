@@ -119,7 +119,6 @@ public class ChatController {
             Preferences.userNodeForPackage(ChatController.class);
     private int idConversa = 0;
 
-   
 
     private boolean tituloGerado = false;
 
@@ -136,29 +135,29 @@ public class ChatController {
 
     private static final String PROMPT_RAG =
             """
-            Você é a Orbit-IA, um assistente baseado em documentos.
-
-            Sua função é responder perguntas utilizando exclusivamente
-            as informações presentes nos documentos fornecidos no contexto.
-
-            REGRAS OBRIGATÓRIAS:
-
-            1. Utilize somente informações presentes no contexto.
-            2. Não utilize conhecimento externo.
-            3. Não invente informações.
-            4. Não faça suposições.
-            5. Não complete informações ausentes com conhecimento próprio.
-            6. Não contradiga os documentos.
-            7. Responda em português do Brasil.
-            8. Seja objetivo e claro.
-            9. Caso a informação solicitada não esteja no contexto,
-               responda:
-
-               "Não encontrei essa informação nos documentos disponíveis."
-
-            A resposta deve ser fundamentada exclusivamente
-            nos documentos recuperados pelo sistema RAG.
-            """;
+                    Você é a Orbit-IA, um assistente baseado em documentos.
+                    
+                    Sua função é responder perguntas utilizando exclusivamente
+                    as informações presentes nos documentos fornecidos no contexto.
+                    
+                    REGRAS OBRIGATÓRIAS:
+                    
+                    1. Utilize somente informações presentes no contexto.
+                    2. Não utilize conhecimento externo.
+                    3. Não invente informações.
+                    4. Não faça suposições.
+                    5. Não complete informações ausentes com conhecimento próprio.
+                    6. Não contradiga os documentos.
+                    7. Responda em português do Brasil.
+                    8. Seja objetivo e claro.
+                    9. Caso a informação solicitada não esteja no contexto,
+                       responda:
+                    
+                       "Não encontrei essa informação nos documentos disponíveis."
+                    
+                    A resposta deve ser fundamentada exclusivamente
+                    nos documentos recuperados pelo sistema RAG.
+                    """;
 
 
     // =====================================================
@@ -167,19 +166,19 @@ public class ChatController {
 
     private static final String PROMPT_TITULO =
             """
-            Você é responsável por criar títulos para conversas.
-
-            Analise a primeira mensagem do usuário e crie um título
-            curto que represente o assunto principal.
-
-            Regras:
-
-            - Português do Brasil.
-            - Máximo de 6 palavras.
-            - Não use aspas.
-            - Não use ponto final.
-            - Responda somente com o título.
-            """;
+                    Você é responsável por criar títulos para conversas.
+                    
+                    Analise a primeira mensagem do usuário e crie um título
+                    curto que represente o assunto principal.
+                    
+                    Regras:
+                    
+                    - Português do Brasil.
+                    - Máximo de 6 palavras.
+                    - Não use aspas.
+                    - Não use ponto final.
+                    - Responda somente com o título.
+                    """;
 
 
     // =====================================================
@@ -199,9 +198,9 @@ public class ChatController {
 
     @FXML
     private void initialize() {
-        
+
         carregarTemaSalvo();
-     
+
         iniciarHistorico();
 
         listaHistorico.setItems(
@@ -240,7 +239,6 @@ public class ChatController {
             configurarAtalhos();
         });
     }
-
 
 
     // =====================================================
@@ -357,10 +355,9 @@ public class ChatController {
         // =================================================
 
 
-
-                // =================================================
-                // RESPOSTA
-                // =================================================
+        // =================================================
+        // RESPOSTA
+        // =================================================
 
         // =====================================================
 // RAG → WEB FALLBACK
@@ -553,33 +550,33 @@ public class ChatController {
 
         String mensagemFinal =
                 """
-                CONTEXTO RECUPERADO DOS DOCUMENTOS
-                ==================================
-
-                %s
-
-
-                PERGUNTA DO USUÁRIO
-                ===================
-
-                %s
-
-
-                INSTRUÇÕES
-                ==========
-
-                Responda utilizando SOMENTE as informações
-                presentes no contexto acima.
-
-                Se a resposta não estiver presente no contexto,
-                responda:
-
-                "Não encontrei essa informação nos documentos disponíveis."
-
-                Não utilize conhecimento externo.
-                Não faça suposições.
-                Não invente informações.
-                """.formatted(
+                        CONTEXTO RECUPERADO DOS DOCUMENTOS
+                        ==================================
+                        
+                        %s
+                        
+                        
+                        PERGUNTA DO USUÁRIO
+                        ===================
+                        
+                        %s
+                        
+                        
+                        INSTRUÇÕES
+                        ==========
+                        
+                        Responda utilizando SOMENTE as informações
+                        presentes no contexto acima.
+                        
+                        Se a resposta não estiver presente no contexto,
+                        responda:
+                        
+                        "Não encontrei essa informação nos documentos disponíveis."
+                        
+                        Não utilize conhecimento externo.
+                        Não faça suposições.
+                        Não invente informações.
+                        """.formatted(
                         contextoFinal,
                         pergunta
                 );
@@ -1189,10 +1186,7 @@ public class ChatController {
                 adicionarUsuario(
                         mensagem.getContent()
                 );
-            }
-
-
-            else if (
+            } else if (
                     mensagem.getRole()
                             .equals("assistant")
             ) {
@@ -1298,14 +1292,14 @@ public class ChatController {
         new Alert(
                 Alert.AlertType.INFORMATION,
                 """
-                ☀ / 🌙  Alterar tema
-
-                Enter → Enviar
-
-                Ctrl + N → Nova conversa
-
-                Ctrl + L → Limpar campo
-                """
+                        ☀ / 🌙  Alterar tema
+                        
+                        Enter → Enviar
+                        
+                        Ctrl + N → Nova conversa
+                        
+                        Ctrl + L → Limpar campo
+                        """
         ).showAndWait();
     }
 
@@ -1339,10 +1333,7 @@ public class ChatController {
                         enviarMensagem();
 
                         e.consume();
-                    }
-
-
-                    else if (
+                    } else if (
                             e.isControlDown()
                                     &&
                                     e.getCode()
@@ -1352,10 +1343,7 @@ public class ChatController {
                         novaConversa();
 
                         e.consume();
-                    }
-
-
-                    else if (
+                    } else if (
                             e.isControlDown()
                                     &&
                                     e.getCode()
@@ -2012,6 +2000,7 @@ public class ChatController {
                     );
                 });
     }
+
     private void carregarTemaSalvo() {
 
         temaEscuro =

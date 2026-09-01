@@ -10,5 +10,5 @@ module com.example.chatdesktop {
 
     opens com.example.chatdesktop.controller
             to javafx.fxml;
-    
+
 }
