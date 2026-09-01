@@ -4,9 +4,11 @@ module com.example.chatdesktop {
     requires javafx.fxml;
     requires java.net.http;
     requires com.google.gson;
+    requires java.prefs;
 
     exports com.example.chatdesktop;
 
     opens com.example.chatdesktop.controller
             to javafx.fxml;
+    
 }
