@@ -16,46 +16,76 @@
         fx:controller="com.example.chatdesktop.controller.ChatController"
         styleClass="root">
 
-    <!-- ================================================= -->
-    <!-- BARRA LATERAL -->
-    <!-- ================================================= -->
+    <!-- =========================================================
+         SIDEBAR
+         ========================================================= -->
 
     <left>
 
         <VBox
                 fx:id="sidebar"
-                prefWidth="230"
-                spacing="18"
+                prefWidth="255"
+                spacing="14"
                 styleClass="sidebar">
 
             <padding>
                 <Insets
-                        top="18"
+                        top="20"
                         right="16"
-                        bottom="16"
+                        bottom="18"
                         left="16"/>
             </padding>
+
+            <!-- LOGO -->
+
+            <HBox
+                    alignment="CENTER_LEFT"
+                    spacing="10"
+                    styleClass="brand-container">
+
+                <Label
+                        text="✦"
+                        styleClass="brand-icon"/>
+
+                <VBox spacing="1">
+
+                    <Label
+                            text="Orbit-IA"
+                            styleClass="brand-title"/>
+
+                    <Label
+                            text="AI Assistant"
+                            styleClass="brand-subtitle"/>
+
+                </VBox>
+
+            </HBox>
 
 
             <!-- NOVA CONVERSA -->
 
             <Button
                     fx:id="botaoNovaConversa"
-                    text="✦  Nova conversa"
-                    prefHeight="42"
+                    text="+  Nova conversa"
+                    prefHeight="44"
                     maxWidth="Infinity"
                     onAction="#novaConversa"
                     styleClass="new-chat-button"/>
 
 
-            <!-- TÍTULO HISTÓRICO -->
-
-            <Label
-                    text="◷  HISTÓRICO"
-                    styleClass="history-title"/>
-
-
             <!-- HISTÓRICO -->
+
+            <HBox
+                    alignment="CENTER_LEFT"
+                    spacing="7"
+                    styleClass="section-header">
+
+                <Label
+                        text="Conversas"
+                        styleClass="history-title"/>
+
+            </HBox>
+
 
             <ListView
                     fx:id="listaHistorico"
@@ -78,9 +108,9 @@
     </left>
 
 
-    <!-- ================================================= -->
-    <!-- ÁREA PRINCIPAL -->
-    <!-- ================================================= -->
+    <!-- =========================================================
+         ÁREA PRINCIPAL
+         ========================================================= -->
 
     <center>
 
@@ -88,17 +118,19 @@
                 styleClass="main-container">
 
 
-            <!-- ================= TOPO ================= -->
+            <!-- =================================================
+                 HEADER
+                 ================================================= -->
 
             <top>
 
                 <HBox
-                        spacing="10"
                         alignment="CENTER_LEFT"
+                        spacing="12"
                         styleClass="header">
 
                     <VBox
-                            spacing="2"
+                            spacing="3"
                             HBox.hgrow="ALWAYS">
 
                         <Label
@@ -106,19 +138,19 @@
                                 styleClass="title"/>
 
                         <Label
-                                text="◉ Assistente inteligente • Groq"
+                                text="Seu assistente inteligente"
                                 styleClass="subtitle"/>
 
                     </VBox>
 
 
-                    <!-- TEMA -->
+                    <!-- BOTÃO DE TEMA -->
 
                     <Button
                             fx:id="botaoTema"
-                            text="☀"
-                            prefWidth="48"
-                            prefHeight="40"
+                            text="☼"
+                            prefWidth="42"
+                            prefHeight="42"
                             onAction="#alternarTema"
                             styleClass="theme-button"/>
 
@@ -127,7 +159,9 @@
             </top>
 
 
-            <!-- ================= CHAT ================= -->
+            <!-- =================================================
+                 CHAT
+                 ================================================= -->
 
             <center>
 
@@ -142,15 +176,16 @@
 
                         <VBox
                                 fx:id="chatContainer"
-                                spacing="15"
-                                fillWidth="true">
+                                spacing="18"
+                                fillWidth="true"
+                                styleClass="chat-container">
 
                             <padding>
                                 <Insets
-                                        top="22"
-                                        right="28"
-                                        bottom="22"
-                                        left="28"/>
+                                        top="30"
+                                        right="50"
+                                        bottom="30"
+                                        left="50"/>
                             </padding>
 
                         </VBox>
@@ -162,41 +197,42 @@
             </center>
 
 
-            <!-- ================= INPUT ================= -->
+            <!-- =================================================
+                 CAMPO DE MENSAGEM
+                 ================================================= -->
 
             <bottom>
 
-                <HBox
-                        spacing="12"
-                        alignment="CENTER"
-                        styleClass="input-container">
+                <VBox
+                        styleClass="input-area">
 
-                    <padding>
-                        <Insets
-                                top="14"
-                                right="18"
-                                bottom="14"
-                                left="18"/>
-                    </padding>
+                    <HBox
+                            alignment="CENTER"
+                            spacing="10"
+                            styleClass="input-container">
 
+                        <TextField
+                                fx:id="campoMensagem"
+                                promptText="Pergunte alguma coisa..."
+                                HBox.hgrow="ALWAYS"
+                                onAction="#enviarMensagem"
+                                styleClass="message-input"/>
 
-                    <TextField
-                            fx:id="campoMensagem"
-                            promptText="Digite sua mensagem..."
-                            HBox.hgrow="ALWAYS"
-                            onAction="#enviarMensagem"
-                            styleClass="message-input"/>
+                        <Button
+                                fx:id="botaoEnviar"
+                                text="↑"
+                                prefWidth="46"
+                                prefHeight="46"
+                                onAction="#enviarMensagem"
+                                styleClass="send-button"/>
 
+                    </HBox>
 
-                    <Button
-                            fx:id="botaoEnviar"
-                            text="Enviar ➤"
-                            prefWidth="115"
-                            prefHeight="42"
-                            onAction="#enviarMensagem"
-                            styleClass="send-button"/>
+                    <Label
+                            text="Orbit-IA pode cometer erros. Verifique informações importantes."
+                            styleClass="input-hint"/>
 
-                </HBox>
+                </VBox>
 
             </bottom>
 

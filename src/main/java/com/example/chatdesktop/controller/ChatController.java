@@ -1,5 +1,6 @@
 package com.example.chatdesktop.controller;
 
+import com.example.chatdesktop.dao.ChatDAO;
 import com.example.chatdesktop.model.ChatMessage;
 import com.example.chatdesktop.service.DocumentService;
 import com.example.chatdesktop.service.GroqService;
@@ -31,20 +32,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import javafx.scene.control.ListCell;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.Priority;
 import java.util.prefs.Preferences;
+import com.example.chatdesktop.dao.ChatDAO;
+import com.example.chatdesktop.model.Conversation;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import com.example.chatdesktop.model.Conversation;
 public class ChatController {
+    private final ChatDAO chatDAO = new ChatDAO();
+
+    private final List<Conversation> conversasBanco =
+            new ArrayList<>();
+
+    private int conversaAtualId = -1;
 
     @FXML
     private VBox chatContainer;
@@ -87,7 +91,9 @@ public class ChatController {
                     new DocumentService(
                             Path.of("knowledge")
                     )
+
             );
+
 
 
     // =====================================================
@@ -199,6 +205,10 @@ public class ChatController {
     @FXML
     private void initialize() {
 
+        chatDAO.criarTabelas();
+
+        carregarHistoricoDoBanco();
+
         carregarTemaSalvo();
 
         iniciarHistorico();
@@ -209,9 +219,9 @@ public class ChatController {
 
         configurarListaHistorico();
 
-        listaHistorico.setOnMouseClicked(e -> {
+        listaHistorico.setOnMouseClicked(event -> {
 
-            if (e.getClickCount() == 2) {
+            if (event.getClickCount() == 2) {
 
                 int indice =
                         listaHistorico
@@ -239,6 +249,25 @@ public class ChatController {
             configurarAtalhos();
         });
     }
+    private void carregarHistoricoDoBanco() {
+
+
+
+            conversasBanco.clear();
+
+            listaConversas.clear();
+
+            conversasBanco.addAll(
+                    chatDAO.listarConversas()
+            );
+
+            for (Conversation conversa : conversasBanco) {
+
+                listaConversas.add(
+                        conversa.getTitulo()
+                );
+            }
+        }
 
 
     // =====================================================
@@ -276,13 +305,11 @@ public class ChatController {
                         .getText()
                         .trim();
 
-
         if (texto.isEmpty() ||
                 campoMensagem.isDisabled()) {
 
             return;
         }
-
 
         campoMensagem.clear();
 
@@ -295,9 +322,38 @@ public class ChatController {
                 historico.stream()
                         .noneMatch(
                                 m ->
-                                        m.getRole()
-                                                .equals("user")
+                                        "user".equals(
+                                                m.getRole()
+                                        )
                         );
+
+
+        // =================================================
+        // CRIA A CONVERSA NO SQLITE
+        // =================================================
+
+        if (conversaAtualId == -1) {
+
+            String titulo =
+                    gerarTituloDaPrimeiraMensagem(
+                            texto
+                    );
+
+            conversaAtualId =
+                    chatDAO.criarConversa(
+                            titulo
+                    );
+
+            carregarHistoricoDoBanco();
+        }
+
+
+        // =================================================
+        // GUARDA O ID DA CONVERSA ATUAL
+        // =================================================
+
+        final int conversaId =
+                conversaAtualId;
 
 
         // =================================================
@@ -308,23 +364,33 @@ public class ChatController {
 
 
         // =================================================
-        // HISTÓRICO
+        // CRIA A MENSAGEM DO USUÁRIO
         // =================================================
 
-        historico.add(
+        ChatMessage mensagemUsuario =
                 new ChatMessage(
                         "user",
                         texto
-                )
+                );
+
+
+        // =================================================
+        // HISTÓRICO EM MEMÓRIA
+        // =================================================
+
+        historico.add(
+                mensagemUsuario
         );
 
 
         // =================================================
-        // ID
+        // SALVA NO SQLITE
         // =================================================
 
-        int id =
-                idConversa;
+        chatDAO.salvarMensagem(
+                conversaId,
+                mensagemUsuario
+        );
 
 
         // =================================================
@@ -337,7 +403,7 @@ public class ChatController {
 
 
         // =================================================
-        // TÍTULO
+        // TÍTULO AUTOMÁTICO
         // =================================================
 
         if (primeiraMensagem &&
@@ -345,23 +411,14 @@ public class ChatController {
 
             gerarTituloAutomaticamente(
                     texto,
-                    id
+                    conversaId
             );
         }
 
 
         // =================================================
-        // RAG
+        // RAG → WEB FALLBACK
         // =================================================
-
-
-        // =================================================
-        // RESPOSTA
-        // =================================================
-
-        // =====================================================
-// RAG → WEB FALLBACK
-// =====================================================
 
         CompletableFuture
                 .supplyAsync(() ->
@@ -371,26 +428,13 @@ public class ChatController {
                         )
                 )
 
-                // =================================================
-                // DECISÃO
-                // =================================================
-
                 .thenCompose(contexto -> {
-
-                    // =================================================
-                    // RAG ENCONTROU
-                    // =================================================
 
                     if (contexto != null &&
                             !contexto.isBlank()) {
 
-                        System.out.println();
                         System.out.println(
                                 "📚 RAG encontrou informações."
-                        );
-
-                        System.out.println(
-                                "📚 Utilizando documentos locais."
                         );
 
                         return groq.enviarMensagem(
@@ -400,15 +444,6 @@ public class ChatController {
                                 )
                         );
                     }
-
-                    // =================================================
-                    // RAG NÃO ENCONTROU
-                    // =================================================
-
-                    System.out.println();
-                    System.out.println(
-                            "🌐 RAG não encontrou informações suficientes."
-                    );
 
                     System.out.println(
                             "🌐 Ativando pesquisa na internet."
@@ -425,16 +460,32 @@ public class ChatController {
 
                 .thenAccept(resposta -> {
 
-                    if (id != idConversa) {
+                    /*
+                     * Evita mostrar a resposta em outra conversa.
+                     */
+                    if (conversaId != conversaAtualId) {
                         return;
                     }
 
-                    historico.add(
+                    ChatMessage mensagemIA =
                             new ChatMessage(
                                     "assistant",
                                     resposta
-                            )
+                            );
+
+
+                    // HISTÓRICO EM MEMÓRIA
+                    historico.add(
+                            mensagemIA
                     );
+
+
+                    // SQLITE
+                    chatDAO.salvarMensagem(
+                            conversaId,
+                            mensagemIA
+                    );
+
 
                     Platform.runLater(() -> {
 
@@ -452,7 +503,7 @@ public class ChatController {
 
                 .exceptionally(erro -> {
 
-                    if (id != idConversa) {
+                    if (conversaId != conversaAtualId) {
                         return null;
                     }
 
@@ -1081,66 +1132,22 @@ public class ChatController {
     @FXML
     private void novaConversa() {
 
-        boolean possuiUsuario =
-                historico.stream()
-                        .anyMatch(
-                                m ->
-                                        m.getRole()
-                                                .equals("user")
-                        );
+        conversaAtualId = -1;
 
-
-        if (possuiUsuario) {
-
-            conversas.add(
-                    0,
-                    new ArrayList<>(
-                            historico
-                    )
-            );
-
-
-            String titulo =
-                    tituloConversaAtual;
-
-
-            if (titulo == null ||
-                    titulo.isBlank()) {
-
-                titulo =
-                        "Nova conversa";
-            }
-
-
-            listaConversas.add(
-                    0,
-                    titulo
-            );
-        }
-
-
-        idConversa++;
-
+        chatContainer.getChildren().clear();
 
         iniciarHistorico();
 
-
-        tituloConversaAtual =
-                "Nova conversa";
-
-
-        chatContainer
-                .getChildren()
-                .clear();
-
-
         adicionarIA(
-                "🍥 Nova conversa iniciada!\n\n"
-                        + "Como posso ajudar?"
+                "🍥 Seja bem-vindo à Orbit-IA!\n\n"
+                        + "Como posso ajudar você?"
         );
 
+        listaHistorico
+                .getSelectionModel()
+                .clearSelection();
 
-        liberar();
+        campoMensagem.requestFocus();
     }
 
 
@@ -1153,43 +1160,85 @@ public class ChatController {
     ) {
 
         if (indice < 0 ||
-                indice >= conversas.size()) {
+                indice >= conversasBanco.size()) {
 
             return;
         }
 
 
+        // =================================================
+        // CANCELA RESPOSTAS DA CONVERSA ANTERIOR
+        // =================================================
+
         idConversa++;
 
 
-        historico.clear();
+        // =================================================
+        // PEGA A CONVERSA DO BANCO
+        // =================================================
 
+        Conversation conversa =
+                conversasBanco.get(
+                        indice
+                );
+
+
+        conversaAtualId =
+                conversa.getId();
+
+
+        tituloConversaAtual =
+                conversa.getTitulo();
+
+
+        // =================================================
+        // CARREGA MENSAGENS DO SQLITE
+        // =================================================
+
+        List<ChatMessage> mensagens =
+                chatDAO.buscarMensagens(
+                        conversaAtualId
+                );
+
+
+        // =================================================
+        // LIMPA MEMÓRIA
+        // =================================================
+
+        iniciarHistorico();
 
         historico.addAll(
-                conversas.get(
-                        indice
-                )
+                mensagens
         );
 
+
+        // =================================================
+        // LIMPA TELA
+        // =================================================
 
         chatContainer
                 .getChildren()
                 .clear();
 
 
-        for (ChatMessage mensagem :
-                historico) {
+        // =================================================
+        // MOSTRA MENSAGENS
+        // =================================================
 
-            if (mensagem.getRole()
-                    .equals("user")) {
+        for (ChatMessage mensagem :
+                mensagens) {
+
+            if ("user".equals(
+                    mensagem.getRole()
+            )) {
 
                 adicionarUsuario(
                         mensagem.getContent()
                 );
-            } else if (
+
+            } else if ("assistant".equals(
                     mensagem.getRole()
-                            .equals("assistant")
-            ) {
+            )) {
 
                 adicionarIA(
                         mensagem.getContent()
@@ -1198,19 +1247,20 @@ public class ChatController {
         }
 
 
-        if (indice <
-                listaConversas.size()) {
-
-            tituloConversaAtual =
-                    listaConversas.get(
-                            indice
-                    );
-        }
-
-
         tituloGerado = true;
 
         gerandoTitulo = false;
+
+
+        // =================================================
+        // SELECIONA A CONVERSA
+        // =================================================
+
+        listaHistorico
+                .getSelectionModel()
+                .select(
+                        indice
+                );
 
 
         liberar();
@@ -1669,27 +1719,36 @@ public class ChatController {
     ) {
 
         if (indice < 0 ||
-                indice >= conversas.size()) {
+                indice >= conversasBanco.size()) {
 
             return;
         }
 
 
-        String titulo =
-                listaConversas.get(
+        // =========================================
+        // PEGA A CONVERSA DO BANCO
+        // =========================================
+
+        Conversation conversa =
+                conversasBanco.get(
                         indice
                 );
 
+        int conversaId =
+                conversa.getId();
 
-        // =================================================
-        // ALERTA DE CONFIRMAÇÃO
-        // =================================================
+        String titulo =
+                conversa.getTitulo();
+
+
+        // =========================================
+        // CONFIRMAÇÃO
+        // =========================================
 
         Alert confirmacao =
                 new Alert(
                         Alert.AlertType.CONFIRMATION
                 );
-
 
         confirmacao.setTitle(
                 "Excluir conversa"
@@ -1706,49 +1765,78 @@ public class ChatController {
         );
 
 
-        // =================================================
-        // AGUARDA RESPOSTA
-        // =================================================
+        // =========================================
+        // CONFIRMAR
+        // =========================================
 
         confirmacao.showAndWait()
                 .ifPresent(botao -> {
 
-                    if (botao ==
+                    if (botao !=
                             javafx.scene.control.ButtonType.OK) {
 
-
-                        // =========================================
-                        // REMOVE A CONVERSA DA MEMÓRIA
-                        // =========================================
-
-                        conversas.remove(
-                                indice
-                        );
+                        return;
+                    }
 
 
-                        // =========================================
-                        // REMOVE DA BARRA LATERAL
-                        // =========================================
+                    // =====================================
+                    // EXCLUI DO SQLITE
+                    // =====================================
 
-                        listaConversas.remove(
-                                indice
-                        );
-
-
-                        // =========================================
-                        // LIMPA A SELEÇÃO
-                        // =========================================
-
-                        listaHistorico
-                                .getSelectionModel()
-                                .clearSelection();
+                    chatDAO.excluirConversa(
+                            conversaId
+                    );
 
 
-                        System.out.println(
-                                "🗑 Conversa excluída: "
-                                        + titulo
+                    // =====================================
+                    // ATUALIZA LISTA
+                    // =====================================
+
+                    conversasBanco.remove(
+                            indice
+                    );
+
+                    listaConversas.remove(
+                            indice
+                    );
+
+
+                    // =====================================
+                    // SE ERA A CONVERSA ATUAL
+                    // =====================================
+
+                    if (conversaAtualId == conversaId) {
+
+                        conversaAtualId = -1;
+
+                        idConversa++;
+
+                        chatContainer
+                                .getChildren()
+                                .clear();
+
+                        iniciarHistorico();
+
+                        adicionarIA(
+                                "🍥 Seja bem-vindo à Orbit-IA!\n\n"
+                                        + "Como posso ajudar você?"
                         );
                     }
+
+
+                    // =====================================
+                    // LIMPA SELEÇÃO
+                    // =====================================
+
+                    listaHistorico
+                            .getSelectionModel()
+                            .clearSelection();
+
+
+                    System.out.println(
+                            "🗑 Conversa excluída do SQLite: "
+                                    + titulo
+                    );
                 });
     }
     // =====================================================
@@ -1836,15 +1924,12 @@ public class ChatController {
 
                         excluir.setOnAction(event -> {
 
-                            int indice =
-                                    getIndex();
+                            int indice = getIndex();
 
                             if (indice >= 0 &&
-                                    indice < conversas.size()) {
+                                    indice < conversasBanco.size()) {
 
-                                excluirConversa(
-                                        indice
-                                );
+                                excluirConversa(indice);
                             }
 
                             event.consume();
@@ -2055,6 +2140,23 @@ public class ChatController {
                             : "🌙"
             );
         });
+    }
+    private String gerarTituloDaPrimeiraMensagem(
+            String texto
+    ) {
+
+        texto = texto.trim();
+
+        int tamanhoMaximo = 40;
+
+        if (texto.length() <= tamanhoMaximo) {
+            return texto;
+        }
+
+        return texto.substring(
+                0,
+                tamanhoMaximo
+        ).trim() + "...";
     }
 }
 

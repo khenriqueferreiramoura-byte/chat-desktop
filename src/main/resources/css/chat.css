@@ -1,127 +1,96 @@
 /* =========================================================
-   JavaFX 21
+   ORBIT-IA
+   JAVA FX 21
+   TEMA ESCURO
    ========================================================= */
 
-/* ---------- ROOT ---------- */
+
+/* =========================================================
+   ROOT
+   ========================================================= */
 
 .root {
-    -fx-background-color: #080611;
+    -fx-background-color: #050a12;
     -fx-font-family: "Segoe UI";
 }
 
-/* =====================================================
-   FUNDO PRINCIPAL
-   ===================================================== */
 
-.chat-background {
-    -fx-background-color: #05080f;
+/* =========================================================
+   SIDEBAR
+   ========================================================= */
+
+.sidebar {
+    -fx-background-color: #0c1523;
+
+    -fx-border-color: #26364d;
+    -fx-border-width: 0 1 0 0;
 }
 
 
-/* =====================================================
-   BARRA SUPERIOR
-   ===================================================== */
+/* =========================================================
+   MARCA DA SIDEBAR
+   ========================================================= */
 
-.top-bar {
-    -fx-background-color:
-            linear-gradient(
-                    to right,
-                    #05070c,
-                    #0d1625,
-                    #111827,
-                    #080b12
-            );
-
-    -fx-border-color: #701aef;
-    -fx-border-width: 0 0 2 0;
-
-    -fx-padding: 15 20 15 20;
+.sidebar-brand {
+    -fx-padding: 2 4 8 4;
 }
 
 
-/* =====================================================
-   TÍTULO
-   ===================================================== */
+.sidebar-logo {
+    -fx-text-fill: #ff8500;
 
-.titulo {
-    -fx-text-fill: #000000;
+    -fx-font-size: 22px;
 
-    -fx-font-family: "Segoe UI";
-
-    -fx-font-size: 36px;
-
-    -fx-font-weight: 900;
-
-    -fx-letter-spacing: 2px;
+    -fx-font-weight: bold;
 
     -fx-effect:
             dropshadow(
                     gaussian,
-                    rgba(255, 100, 0, 0.9),
-                    18,
-                    0.6,
+                    rgba(255, 101, 0, 0.45),
+                    12,
+                    0.4,
                     0,
                     0
             );
 }
 
 
-/* =====================================================
-   SUBTÍTULO
-   ===================================================== */
+.sidebar-description {
+    -fx-text-fill: #71829b;
 
-.modelo {
-    -fx-text-fill: #1674ea;
-
-    -fx-font-family: "Segoe UI";
-
-    -fx-font-size: 13px;
-
-    -fx-font-weight: normal;
-
-    -fx-letter-spacing: 1px;
+    -fx-font-size: 11px;
 }
 
 
-/* =====================================================
-   BOTÃO NOVA CONVERSA
-   ===================================================== */
+/* =========================================================
+   NOVA CONVERSA
+   ========================================================= */
 
 .new-chat-button {
     -fx-background-color:
             linear-gradient(
                     to right,
-                    #e85d04,
-                    #9d0208
+                    #ff8500,
+                    #c90000
             );
 
     -fx-text-fill: white;
 
-    -fx-font-size: 13px;
+    -fx-font-size: 14px;
 
     -fx-font-weight: bold;
 
     -fx-background-radius: 12;
 
-    -fx-border-color: #ffb703;
-
     -fx-border-radius: 12;
+
+    -fx-border-color: #ff9d00;
 
     -fx-border-width: 1;
 
-    -fx-padding: 10 16 10 16;
-
     -fx-cursor: hand;
 
-    -fx-effect:
-            dropshadow(
-                    gaussian,
-                    rgba(255, 100, 0, 0.25),
-                    10,
-                    0.3,
-                    0,
-                    3
-            );
+    -fx-padding: 10 16 10 16;
 }
 
 
@@ -129,18 +98,16 @@
     -fx-background-color:
             linear-gradient(
                     to right,
-                    #ff7b00,
-                    #d00000
+                    #ff9d00,
+                    #e00000
             );
-
-    -fx-text-fill: white;
 
     -fx-effect:
             dropshadow(
                     gaussian,
-                    rgba(255, 140, 0, 0.75),
-                    16,
-                    0.5,
+                    rgba(255, 133, 0, 0.55),
+                    14,
+                    0.4,
                     0,
                     0
             );
@@ -148,37 +115,323 @@
 
 
 .new-chat-button:pressed {
-    -fx-background-color: #9d0208;
+    -fx-background-color: #c90000;
 }
 
 
-/* =====================================================
-   SCROLL DO CHAT
-   ===================================================== */
+/* =========================================================
+   HISTÓRICO
+   ========================================================= */
+
+.history-title {
+    -fx-text-fill: #ffffff;
+
+    -fx-font-size: 12px;
+
+    -fx-font-weight: bold;
+
+    -fx-letter-spacing: 1px;
+
+    -fx-padding: 8 2 2 2;
+}
+
+
+/* =========================================================
+   LISTA DO HISTÓRICO
+   ========================================================= */
+
+.history-list {
+    -fx-background-color: #101b2b;
+
+    -fx-control-inner-background: #101b2b;
+
+    -fx-border-color: #263b55;
+
+    -fx-border-width: 1;
+
+    -fx-border-radius: 12;
+
+    -fx-background-radius: 12;
+
+    -fx-padding: 5;
+}
+
+
+/* Células */
+
+.history-list .list-cell {
+    -fx-background-color: transparent;
+
+    -fx-text-fill: #d7e1ee;
+
+    -fx-font-size: 13px;
+
+    -fx-padding: 11 10;
+
+    -fx-background-radius: 8;
+}
+
+
+.history-list .list-cell:hover {
+    -fx-background-color: #1b2a40;
+
+    -fx-text-fill: white;
+}
+
+
+.history-list .list-cell:selected {
+    -fx-background-color: #263b55;
+
+    -fx-text-fill: white;
+}
+
+
+/* =========================================================
+   OPÇÕES
+   ========================================================= */
+
+.options-button {
+    -fx-background-color: #172337;
+
+    -fx-text-fill: #d7e1ee;
+
+    -fx-font-size: 14px;
+
+    -fx-font-weight: bold;
+
+    -fx-background-radius: 12;
+
+    -fx-border-radius: 12;
+
+    -fx-border-color: #30445e;
+
+    -fx-border-width: 1;
+
+    -fx-cursor: hand;
+}
+
+
+.options-button:hover {
+    -fx-background-color: #22334d;
+
+    -fx-border-color: #405875;
+
+    -fx-text-fill: white;
+}
+
+
+/* =========================================================
+   ÁREA PRINCIPAL
+   ========================================================= */
+
+.main-container {
+    -fx-background-color: #050a12;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.header {
+    -fx-background-color:
+            linear-gradient(
+                    to right,
+                    #080e17,
+                    #0d1625,
+                    #080e17
+            );
+
+    -fx-padding: 15 24 16 24;
+
+    -fx-border-color:
+            transparent
+            transparent
+            #ff8500
+            transparent;
+
+    -fx-border-width: 0 0 1 0;
+}
+
+
+/* =========================================================
+   TÍTULO
+   ========================================================= */
+
+.title {
+    -fx-text-fill: #ff8500;
+
+    -fx-font-family: "Segoe UI";
+
+    -fx-font-size: 28px;
+
+    -fx-font-weight: bold;
+
+    -fx-effect:
+            dropshadow(
+                    gaussian,
+                    rgba(255, 101, 0, 0.65),
+                    14,
+                    0.5,
+                    0,
+                    0
+            );
+}
+
+
+/* =========================================================
+   SUBTÍTULO
+   ========================================================= */
+
+.subtitle {
+    -fx-text-fill: #8fa2ba;
+
+    -fx-font-size: 12px;
+}
+
+
+/* =========================================================
+   BOTÃO DE TEMA
+   ========================================================= */
+
+.theme-button {
+    -fx-background-color: #101d2f;
+
+    -fx-text-fill: #f8fafc;
+
+    -fx-font-size: 17px;
+
+    -fx-background-radius: 10;
+
+    -fx-border-radius: 10;
+
+    -fx-border-color: #30445e;
+
+    -fx-border-width: 1;
+
+    -fx-cursor: hand;
+}
+
+
+.theme-button:hover {
+    -fx-background-color: #1b2c44;
+
+    -fx-border-color: #ff9d00;
+
+    -fx-effect:
+            dropshadow(
+                    gaussian,
+                    rgba(255, 157, 0, 0.35),
+                    10,
+                    0.3,
+                    0,
+                    0
+            );
+}
+
+
+/* =========================================================
+   CHAT
+   ========================================================= */
 
 .chat-scroll {
-    -fx-background-color: #05080f;
+    -fx-background-color: #050a12;
+
+    -fx-background: #050a12;
+
     -fx-border-color: transparent;
 }
 
 
 .chat-scroll > .viewport {
-    -fx-background-color: #05080f;
+    -fx-background-color: #050a12;
 }
 
-
-/* =====================================================
-   ÁREA DE MENSAGENS
-   ===================================================== */
 
 .chatContainer {
-    -fx-background-color: #05080f;
+    -fx-background-color: #050a12;
 }
 
 
-/* =====================================================
+/* =========================================================
+   MENSAGEM DA IA
+   ========================================================= */
+
+.ai-message {
+    -fx-background-color:
+            linear-gradient(
+                    to bottom right,
+                    #111c2c,
+                    #0a111d
+            );
+
+    -fx-text-fill: #e8edf4;
+
+    -fx-padding: 14 17;
+
+    -fx-background-radius: 16;
+
+    -fx-border-radius: 16;
+
+    -fx-border-color: #2b405b;
+
+    -fx-border-width: 1;
+
+    -fx-font-size: 14px;
+
+    -fx-effect:
+            dropshadow(
+                    gaussian,
+                    rgba(0, 0, 0, 0.30),
+                    10,
+                    0.25,
+                    0,
+                    3
+            );
+}
+
+
+/* =========================================================
+   MENSAGEM DO USUÁRIO
+   ========================================================= */
+
+.user-message {
+    -fx-background-color:
+            linear-gradient(
+                    to bottom right,
+                    #ff8500,
+                    #c94d00
+            );
+
+    -fx-text-fill: white;
+
+    -fx-padding: 13 17;
+
+    -fx-background-radius: 16;
+
+    -fx-border-radius: 16;
+
+    -fx-border-color: #ff9d00;
+
+    -fx-border-width: 1;
+
+    -fx-font-size: 14px;
+
+    -fx-effect:
+            dropshadow(
+                    gaussian,
+                    rgba(255, 133, 0, 0.18),
+                    10,
+                    0.25,
+                    0,
+                    3
+            );
+}
+
+
+/* =========================================================
    ÍCONE DO USUÁRIO
-   ===================================================== */
+   ========================================================= */
 
 .user-icon {
     -fx-background-color:
@@ -197,9 +450,11 @@
     -fx-border-width: 1.5px;
 
     -fx-min-width: 42px;
+
     -fx-min-height: 42px;
 
     -fx-max-width: 42px;
+
     -fx-max-height: 42px;
 
     -fx-alignment: CENTER;
@@ -209,7 +464,7 @@
     -fx-effect:
             dropshadow(
                     gaussian,
-                    rgba(255, 120, 0, 0.55),
+                    rgba(255, 120, 0, 0.45),
                     10,
                     0.4,
                     0,
@@ -218,9 +473,9 @@
 }
 
 
-/* =====================================================
+/* =========================================================
    ÍCONE DA IA
-   ===================================================== */
+   ========================================================= */
 
 .ai-icon {
     -fx-background-color:
@@ -239,9 +494,11 @@
     -fx-border-width: 1.5px;
 
     -fx-min-width: 42px;
+
     -fx-min-height: 42px;
 
     -fx-max-width: 42px;
+
     -fx-max-height: 42px;
 
     -fx-alignment: CENTER;
@@ -251,7 +508,7 @@
     -fx-effect:
             dropshadow(
                     gaussian,
-                    rgba(30, 150, 255, 0.55),
+                    rgba(30, 150, 255, 0.45),
                     10,
                     0.4,
                     0,
@@ -260,162 +517,95 @@
 }
 
 
-/* =====================================================
-   MENSAGEM DO USUÁRIO
-   ===================================================== */
-
-.user-message {
-    -fx-background-color:
-            linear-gradient(
-                    to bottom right,
-                    #9d3d00,
-                    #5c1700
-            );
-
-    -fx-text-fill: white;
-
-    -fx-background-radius: 15;
-
-    -fx-border-color: #ff8c00;
-
-    -fx-border-radius: 15;
-
-    -fx-border-width: 1;
-
-    -fx-padding: 12px 16px;
-
-    -fx-font-size: 14px;
-
-    -fx-effect:
-            dropshadow(
-                    gaussian,
-                    rgba(255, 100, 0, 0.20),
-                    10,
-                    0.3,
-                    0,
-                    3
-            );
-}
-
-
-/* =====================================================
-   MENSAGEM DA IA
-   ===================================================== */
-
-.ai-message {
-    -fx-background-color:
-            linear-gradient(
-                    to bottom right,
-                    #111c2c,
-                    #0a111d
-            );
-
-    -fx-text-fill: #e8edf4;
-
-    -fx-background-radius: 15;
-
-    -fx-border-color: #263a52;
-
-    -fx-border-radius: 15;
-
-    -fx-border-width: 1;
-
-    -fx-padding: 12px 16px;
-
-    -fx-font-size: 14px;
-
-    -fx-effect:
-            dropshadow(
-                    gaussian,
-                    rgba(0, 0, 0, 0.35),
-                    10,
-                    0.3,
-                    0,
-                    3
-            );
-}
-
-
-/* =====================================================
-   ÁREA INFERIOR
-   ===================================================== */
+/* =========================================================
+   ÁREA DE INPUT
+   ========================================================= */
 
 .input-container {
     -fx-background-color:
             linear-gradient(
                     to right,
-                    #080b12,
+                    #080e17,
                     #0d1420,
-                    #080b12
+                    #080e17
             );
 
-    -fx-border-color: #263a52;
+    -fx-border-color: #26364d transparent transparent transparent;
 
     -fx-border-width: 1 0 0 0;
 }
 
 
-/* =====================================================
-   CAMPO DE MENSAGEM
-   ===================================================== */
+/* =========================================================
+   CAMPO DE TEXTO
+   ========================================================= */
 
 .message-input {
-    -fx-background-color: #090f18;
+    -fx-background-color: #050a12;
 
     -fx-text-fill: white;
 
-    -fx-prompt-text-fill: #667085;
+    -fx-prompt-text-fill: #71829b;
+
+    -fx-font-size: 14px;
+
+    -fx-padding: 12 15;
 
     -fx-background-radius: 12;
 
-    -fx-border-color: #29384b;
-
     -fx-border-radius: 12;
 
-    -fx-padding: 11 14 11 14;
+    -fx-border-color: #30445e;
 
-    -fx-font-size: 14px;
+    -fx-border-width: 1;
+}
+
+
+.message-input:hover {
+    -fx-border-color: #405875;
 }
 
 
 .message-input:focused {
-    -fx-border-color: #ff9d00;
+    -fx-border-color: #ff8500;
 
     -fx-effect:
             dropshadow(
                     gaussian,
-                    rgba(255, 157, 0, 0.35),
+                    rgba(255, 133, 0, 0.35),
                     10,
-                    0.3,
+                    0.4,
                     0,
                     0
             );
 }
 
 
-/* =====================================================
+/* =========================================================
    BOTÃO ENVIAR
-   ===================================================== */
+   ========================================================= */
 
 .send-button {
     -fx-background-color:
             linear-gradient(
-                    to bottom right,
+                    to right,
                     #ff9d00,
-                    #e85d04
+                    #ff6500
             );
 
     -fx-text-fill: white;
+
+    -fx-font-size: 14px;
 
     -fx-font-weight: bold;
 
     -fx-background-radius: 12;
 
-    -fx-border-color: #ffb703;
-
     -fx-border-radius: 12;
 
-    -fx-padding: 10 18 10 18;
+    -fx-border-color: #ffb703;
+
+    -fx-border-width: 1;
 
     -fx-cursor: hand;
 }
@@ -424,17 +614,17 @@
 .send-button:hover {
     -fx-background-color:
             linear-gradient(
-                    to bottom right,
+                    to right,
                     #ffb703,
-                    #fb8500
+                    #ff8500
             );
 
     -fx-effect:
             dropshadow(
                     gaussian,
-                    rgba(255, 140, 0, 0.75),
-                    15,
-                    0.5,
+                    rgba(255, 140, 0, 0.60),
+                    14,
+                    0.45,
                     0,
                     0
             );
@@ -446,12 +636,180 @@
 }
 
 
-/* =====================================================
+/* =========================================================
+   BOTÃO COPIAR
+   ========================================================= */
+
+.copy-button {
+    -fx-background-color: transparent;
+
+    -fx-text-fill: #8b9bb0;
+
+    -fx-font-size: 12px;
+
+    -fx-border-color: #334155;
+
+    -fx-border-width: 1;
+
+    -fx-border-radius: 7;
+
+    -fx-background-radius: 7;
+
+    -fx-padding: 6 10;
+
+    -fx-cursor: hand;
+}
+
+
+.copy-button:hover {
+    -fx-background-color: #182333;
+
+    -fx-text-fill: white;
+
+    -fx-border-color: #ff9d00;
+}
+
+
+.copy-button:pressed {
+    -fx-background-color: #263449;
+}
+
+
+/* =========================================================
+   BOTÃO REGENERAR
+   ========================================================= */
+
+.regenerate-button {
+    -fx-background-color: transparent;
+
+    -fx-text-fill: #8b9bb0;
+
+    -fx-border-color: #334155;
+
+    -fx-border-width: 1;
+
+    -fx-border-radius: 7;
+
+    -fx-background-radius: 7;
+
+    -fx-padding: 6 10;
+
+    -fx-font-size: 12px;
+
+    -fx-cursor: hand;
+}
+
+
+.regenerate-button:hover {
+    -fx-background-color: #182333;
+
+    -fx-text-fill: white;
+
+    -fx-border-color: #ff9d00;
+}
+
+
+/* =========================================================
+   HISTÓRICO — ITEM
+   ========================================================= */
+
+.history-item {
+    -fx-padding: 6 4;
+
+    -fx-alignment: CENTER_LEFT;
+}
+
+
+/* =========================================================
+   HISTÓRICO — TÍTULO
+   ========================================================= */
+
+.history-item-title {
+    -fx-text-fill: #d7e1ee;
+
+    -fx-font-size: 13px;
+
+    -fx-cursor: hand;
+}
+
+
+.history-item-title:hover {
+    -fx-text-fill: white;
+}
+
+
+/* =========================================================
+   EXCLUIR CONVERSA
+   ========================================================= */
+
+.delete-history-button {
+    -fx-background-color: transparent;
+
+    -fx-text-fill: #ff6b6b;
+
+    -fx-border-color: #6b2525;
+
+    -fx-border-radius: 6;
+
+    -fx-background-radius: 6;
+
+    -fx-font-size: 13px;
+
+    -fx-cursor: hand;
+
+    -fx-padding: 4 7;
+}
+
+
+.delete-history-button:hover {
+    -fx-background-color: rgba(255, 0, 0, 0.15);
+
+    -fx-border-color: #ff4444;
+
+    -fx-text-fill: #ff7777;
+}
+
+
+/* =========================================================
+   RENOMEAR CONVERSA
+   ========================================================= */
+
+.rename-history-button {
+    -fx-background-color: transparent;
+
+    -fx-text-fill: #ffb347;
+
+    -fx-border-color: #6b4c25;
+
+    -fx-border-radius: 6;
+
+    -fx-background-radius: 6;
+
+    -fx-font-size: 13px;
+
+    -fx-cursor: hand;
+
+    -fx-padding: 4 7;
+}
+
+
+.rename-history-button:hover {
+    -fx-background-color: rgba(255, 157, 0, 0.12);
+
+    -fx-border-color: #ff9d00;
+
+    -fx-text-fill: #ffc266;
+}
+
+
+/* =========================================================
    SCROLLBAR
-   ===================================================== */
+   ========================================================= */
 
 .chat-scroll .scroll-bar:vertical {
-    -fx-background-color: #080b12;
+    -fx-background-color: #080e17;
+
+    -fx-padding: 2;
 }
 
 
@@ -465,108 +823,18 @@
 .chat-scroll .scroll-bar:vertical .thumb:hover {
     -fx-background-color: #ff8c00;
 }
-.copy-button {
+
+
+.chat-scroll .scroll-bar:vertical .increment-button,
+.chat-scroll .scroll-bar:vertical .decrement-button {
     -fx-background-color: transparent;
-    -fx-text-fill: #8b9bb0;
 
-    -fx-font-size: 12px;
-
-    -fx-border-color: #334155;
-    -fx-border-width: 1px;
-    -fx-border-radius: 6px;
-
-    -fx-background-radius: 6px;
-
-    -fx-padding: 5px 10px;
-
-    -fx-cursor: hand;
-}
-
-.copy-button:hover {
-    -fx-background-color: #182333;
-    -fx-text-fill: white;
-    -fx-border-color: #ff9d00;
-}
-
-.copy-button:pressed {
-    -fx-background-color: #263449;
-}
-.copy-button,
-.regenerate-button {
-
-    -fx-background-radius: 8;
-
-    -fx-padding: 7 12 7 12;
-
-    -fx-font-size: 12px;
-
-    -fx-cursor: hand;
-}
-/* =====================================================
-   ITEM DO HISTÓRICO
-===================================================== */
-
-.history-item {
-    -fx-padding: 6px 4px;
-    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 0;
 }
 
 
-/* =====================================================
-   TÍTULO DA CONVERSA
-===================================================== */
-
-.history-item-title {
-    -fx-font-size: 13px;
-    -fx-cursor: hand;
-}
-
-
-/* =====================================================
-   BOTÃO EXCLUIR
-===================================================== */
-
-.delete-history-button {
-
-    -fx-background-color: #980707;
-
-    -fx-border-color: red;
-
-    -fx-font-size: 14px;
-
-    -fx-cursor: hand;
-
-    -fx-padding: 4px 6px;
-}
-
-
-.delete-history-button:hover {
-
-    -fx-background-color: rgba(255, 0, 0, 0.15);
-
-    -fx-background-radius: 6px;
-}
-/* =====================================================
-   BOTÃO RENOMEAR CONVERSA
-===================================================== */
-
-.rename-history-button {
-
-    -fx-background-color: orange;
-
-    -fx-border-color: yellow;
-
-    -fx-font-size: 14px;
-
-    -fx-cursor: hand;
-
-    -fx-padding: 4px 6px;
-}
-
-
-.rename-history-button:hover {
-
-    -fx-background-color: rgba(255, 255, 255, 0.15);
-
-    -fx-background-radius: 6px;
+.chat-scroll .scroll-bar:vertical .increment-arrow,
+.chat-scroll .scroll-bar:vertical .decrement-arrow {
+    -fx-shape: " ";
+    -fx-padding: 0;
 }
